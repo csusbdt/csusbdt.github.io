@@ -20,6 +20,24 @@ body {
         <li><a href="https://github.com/csusbdt/">Github</a></li>
         <li><a href="https://www.youtube.com/c/csusbdt/about">Youtube</a></li>
         <li><a href="happy_birthday.mp3">Happy Birthday</a></li>
+        <li><a href="#" onclick="next_photo()">next photo</a></li>
     </ul>
+    <script type="module">
+        const photos = [
+            "socal_2022-02-08-11h27m_am.jpg", 
+            "palace_of_electricity.jpg", 
+            "stick_structure.jpg",
+            "san_francisco_1900.jpg",
+            "dave.jpg"
+        ];
+        let i = localStorage.getItem("i");
+        if (i === null) i = 0;
+        document.body.style.backgroundImage = 'url("' + photos[i] + '")';
+        window.next_photo = function() {
+            if (++i >= photos.length) i = 0;
+            localStorage.setItem("i", i);
+            document.body.style.backgroundImage = 'url("' + photos[i] + '")';
+        }
+    </script>
 </body>
 </html>
