@@ -4,7 +4,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <style>
 body {
-    background-image: url("flowers.jpg");
     background-color: #cccccc;
     background-repeat: no-repeat;
     background-position: center;
@@ -20,15 +19,14 @@ body {
         <li><a href="https://github.com/csusbdt/">Github</a></li>
         <li><a href="https://www.youtube.com/c/csusbdt/about">Youtube</a></li>
         <li><a href="happy_birthday.mp3">Happy Birthday</a></li>
-        <li><a href="#" onclick="next_photo()">next photo</a></li>
+        <li><a href="#" onclick="next_photo()">&lt;next bg&gt;</a></li>
     </ul>
     <script type="module">
         const photos = [
-            "socal_2022-02-08-11h27m_am.jpg", 
             "palace_of_electricity.jpg", 
-            "stick_structure.jpg",
             "san_francisco_1900.jpg",
-            "dave.jpg"
+            "socal_2022-02-08-11h27m_am.jpg", 
+            "stick_structure.jpg"
         ];
         let i = localStorage.getItem("i");
         if (i === null) i = 0;
