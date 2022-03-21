@@ -4,37 +4,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <style>
 body {
+    background-image: url("palace_of_electricity.jpg");
     background-color: #cccccc;
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
     margin: 0;
     padding: 20;
-}    
+}
 </style>
 </head>
-<body>
-    <h1>David Turner</h1>
-    <ul>
-        <li><a href="https://github.com/csusbdt/">Github</a></li>
-        <li><a href="https://www.youtube.com/c/csusbdt/about">Youtube</a></li>
-        <li><a href="happy_birthday.mp3">Happy Birthday</a></li>
-        <li><a href="#" onclick="next_photo()">&lt;next bg&gt;</a></li>
-    </ul>
+<body onclick="on_click()">
+    <div id="g_audio" style="display: none">
+        <audio controls><source src="happy_birthday.mp3" type="audio/mpeg"></audio>
+    </div>
+    
     <script type="module">
-        const photos = [
-            "palace_of_electricity.jpg", 
-            "san_francisco_1900.jpg",
-            "socal_2022-02-08-11h27m_am.jpg", 
-            "stick_structure.jpg"
-        ];
-        let i = localStorage.getItem("i");
-        if (i === null) i = 0;
-        document.body.style.backgroundImage = 'url("' + photos[i] + '")';
-        window.next_photo = function() {
-            if (++i >= photos.length) i = 0;
-            localStorage.setItem("i", i);
-            document.body.style.backgroundImage = 'url("' + photos[i] + '")';
+        window.on_click = e => {
+            if (g_audio.style.display === "none") {
+                g_audio.style = "display: flex; justify-content: center; align-items: center;";
+            } else {
+                g_audio.style = "display: none;";               
+            }
         }
     </script>
 </body>
