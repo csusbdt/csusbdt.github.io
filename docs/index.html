@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>dev</title>
+<title>Home</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <style>
 body {
@@ -12,17 +12,24 @@ body {
     margin: 0;
     padding: 20;
 }
+a {
+    color: black;    
+}
 </style>
 </head>
 <body onclick="on_click()">
     <div id="g_audio" style="display: none">
+        <div style="margin-bottom: 1em">Happy Birthday and Farewell</div>
         <audio controls><source src="happy_birthday.mp3" type="audio/mpeg"></audio>
+        <div style="margin-top: 3em">
+            <a href="https://github.com/csusbdt/csusbdt.github.io/wiki">Blog</a>
+        </div>
     </div>
     
     <script type="module">
         window.on_click = e => {
             if (g_audio.style.display === "none") {
-                g_audio.style = "display: flex; justify-content: center; align-items: center;";
+                g_audio.style = "display: flex; flex-direction: column; justify-content: center; align-items: center;";
             } else {
                 g_audio.style = "display: none;";               
             }
