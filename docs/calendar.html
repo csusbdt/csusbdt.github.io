@@ -1,0 +1,45 @@
+<style>
+#g_content {
+  display: flow;
+  flex-direction: column;
+}    
+</style>
+
+<div id="g_content">
+  <div id="g_local_time"></div>
+  <div id="g_gmt"></div>
+  <div>
+    <label>latitude         </label><input id="g_lat" value="34.1083"></input>   <br>
+    <label>longitude        </label><input id="g_long" value="-117.2898"></input> <br>
+    <label>time_zone_offset </label><input id="g_time_zone_offset"></input>      <br>
+  </div>
+  <div>
+    sunrise 
+    <span id="g_sunrise"></span>
+  </div>
+  <div>
+    sunset 
+    <span id="g_sunset"></span>
+  </div>
+</div>
+
+<script src="suncalc.js"  type="module"></script>
+
+<script type="module">
+  let lat  = parseInt(g_lat.value);
+  let long = parseInt(g_long.value);
+  let local_time = new Date();
+
+  const sun = SunCalc.getTimes(local_time, lat, long);
+  g_sunrise.innerHTML = sun.sunrise;
+  g_sunrise.innerHTML = sun.sunrise.getHours() + ':' + sun.sunrise.getMinutes() + ' am';
+  g_sunset.innerHTML = (sun.sunset.getHours() - 12) + ':' + sun.sunset.getMinutes() + ' pm';
+  
+
+  let time_zone_offset     = local_time.getTimezoneOffset();
+  g_time_zone_offset.value = time_zone_offset / 60;
+    
+  let gmt = new Date(local_time.toGMTString());
+  g_local_time.innerHTML = local_time;
+  g_gmt.innerHTML = "GMT: " + local_time.toGMTString();
+</script>
