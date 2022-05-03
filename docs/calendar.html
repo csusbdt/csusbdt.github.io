@@ -1,45 +1,74 @@
+<html>
+<head>
+<title>Home</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <style>
 #g_content {
   display: flow;
   flex-direction: column;
-}    
+  align-items: stretch;
+}
+#g_inputs {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: [label] auto [input] 1fr;        
+}
+input {
+  grid-column: input;
+  align-self: center;
+}
+label {
+  grid-column: label;
+  align-self: center;
+}
+td {
+    width: 50%;
+}
 </style>
+</head>
+<body>
 
 <div id="g_content">
-  <div id="g_local_time"></div>
-  <div id="g_gmt"></div>
-  <div>
-    <label>latitude         </label><input id="g_lat" value="34.1083"></input>   <br>
-    <label>longitude        </label><input id="g_long" value="-117.2898"></input> <br>
-    <label>time_zone_offset </label><input id="g_time_zone_offset"></input>      <br>
-  </div>
-  <div>
-    sunrise 
-    <span id="g_sunrise"></span>
-  </div>
-  <div>
-    sunset 
-    <span id="g_sunset"></span>
-  </div>
-</div>
+<table>
+    <tr><td>local time</td><td id="g_local_time"></td></tr>
+    <tr><td>time_zone_offset</td><td><input id="g_time_zone_offset"></input></td></tr>
+    <tr><td>latitude </td><td><input id="g_lat"  value="34.1083"   ></input></td></tr>
+    <tr><td>longitude</td><td><input id="g_long" value="-117.2898" ></input></td></tr>
+    <tr><td>sunrise</td><td id="g_sunrise"></td></tr>
+    <tr><td>sunset</td><td id="g_sunset"></td></tr>
+    <tr><td>daytime</td><td id="g_daytime"></td></tr>
+</table>
 
-<script src="suncalc.js"  type="module"></script>
+<script src="suncalc.js" type="module"></script> <!-- https://github.com/mourner/suncalc -->
 
 <script type="module">
-  let lat  = parseInt(g_lat.value);
-  let long = parseInt(g_long.value);
-  let local_time = new Date();
+  function update() {
+    const local_time = new Date();
+    g_time_zone_offset.value = local_time.getTimezoneOffset() / 60;
+    //const gmt        = new Date(local_time.toGMTString());
+    const lat        = parseInt(g_lat.value);
+    const long       = parseInt(g_long.value);
+    const sun        = SunCalc.getTimes(local_time, lat, long);
+    g_local_time.innerHTML = local_time;
+    g_sunrise.innerHTML    = sun.sunrise;
+    g_sunrise.innerHTML    = sun.sunrise.getHours() + ':' + sun.sunrise.getMinutes() + ' am';
+    g_sunset.innerHTML     = (sun.sunset.getHours() - 12) + ':' + sun.sunset.getMinutes() + ' pm';
 
-  const sun = SunCalc.getTimes(local_time, lat, long);
-  g_sunrise.innerHTML = sun.sunrise;
-  g_sunrise.innerHTML = sun.sunrise.getHours() + ':' + sun.sunrise.getMinutes() + ' am';
-  g_sunset.innerHTML = (sun.sunset.getHours() - 12) + ':' + sun.sunset.getMinutes() + ' pm';
-  
+    if (local_time.getTime() >= sun.sunrise.getTime() && local_time.getTime() < sun.sunset.getTime()) {
+      const daylight = sun.sunset.getTime() - sun.sunrise.getTime();
+      const daytime = (local_time.getTime() - sun.sunrise.getTime()) / daylight * 100;
+      g_daytime.innerHTML = Math.floor(daytime) + "%";
+    } else {
+      g_daytime.innerHTML = "";
+    }
+      
+  }
+  update();
 
-  let time_zone_offset     = local_time.getTimezoneOffset();
-  g_time_zone_offset.value = time_zone_offset / 60;
-    
-  let gmt = new Date(local_time.toGMTString());
-  g_local_time.innerHTML = local_time;
-  g_gmt.innerHTML = "GMT: " + local_time.toGMTString();
+  g_lat             .addEventListener('change', update);
+  g_long            .addEventListener('change', update);
+  g_time_zone_offset.addEventListener('change', update);
 </script>
+    
+</body>
+</html>
