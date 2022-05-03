@@ -36,7 +36,8 @@ td {
     <tr><td>longitude</td><td><input id="g_long" value="-117.2898" ></input></td></tr>
     <tr><td>sunrise</td><td id="g_sunrise"></td></tr>
     <tr><td>sunset</td><td id="g_sunset"></td></tr>
-    <tr><td>daytime</td><td id="g_daytime"></td></tr>
+    <tr><td>light</td><td id="g_light"></td></tr>
+    <tr><td>dark</td><td id="g_dark"></td></tr>
 </table>
 
 <script src="suncalc.js" type="module"></script> <!-- https://github.com/mourner/suncalc -->
@@ -50,16 +51,26 @@ td {
     const long       = parseInt(g_long.value);
     const sun        = SunCalc.getTimes(local_time, lat, long);
     g_local_time.innerHTML = local_time;
-    g_sunrise.innerHTML    = sun.sunrise;
     g_sunrise.innerHTML    = sun.sunrise.getHours() + ':' + sun.sunrise.getMinutes() + ' am';
     g_sunset.innerHTML     = (sun.sunset.getHours() - 12) + ':' + sun.sunset.getMinutes() + ' pm';
 
-    if (local_time.getTime() >= sun.sunrise.getTime() && local_time.getTime() < sun.sunset.getTime()) {
-      const daylight = sun.sunset.getTime() - sun.sunrise.getTime();
-      const daytime = (local_time.getTime() - sun.sunrise.getTime()) / daylight * 100;
-      g_daytime.innerHTML = Math.floor(daytime) + "%";
+    const hrs24      = 24 * 60 * 60 * 1000;
+    const sunrise    = sun.sunrise.getTime();
+    const sunset     = sun.sunset.getTime();
+    const now        = local_time.getTime();
+    const yesterday  = now - hrs24;
+
+    if (now < sunrise) {
+      g_light.innerHTML = "";
+      const yesterday_sunset = SunCalc.getTimes(now - hrs24, lat, long).sunset.getTime();
+      g_dark.innerHTML = Math.floor((now - yesterday_sunset) / (sunrise - yesterday_sunset) * 100);        
+    } else if (now < sunset) {
+      g_dark.innerHTML = "";
+      g_light.innerHTML = Math.floor((now - sunrise) / (sunset - sunrise) * 100);        
     } else {
-      g_daytime.innerHTML = "";
+      g_light.innerHTML = "";
+      const tomorrow_sunrise = SunCalc.getTimes(now + hrs24, lat, long).sunrise.getTime();
+      g_dark.innerHTML = Math.floor((now - sunset) / (tomorrow_sunrise - sunset) * 100);        
     }
       
   }
