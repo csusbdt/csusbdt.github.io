@@ -30,12 +30,14 @@ td {
 
 <div id="g_content">
 <table>
-    <tr><td>local time</td><td id="g_local_time"></td></tr>
     <tr><td>time_zone_offset</td><td><input id="g_time_zone_offset"></input></td></tr>
     <tr><td>latitude </td><td><input id="g_lat"></input></td></tr>
     <tr><td>longitude</td><td><input id="g_long"></input></td></tr>
-    <tr><td>time</td><td id="g_time"></td></tr>
 </table>
+<hr>
+
+<div id="g_local_time"></div>
+<div id="g_time"></div>
 
 <script src="suncalc.js" type="module"></script> <!-- https://github.com/mourner/suncalc -->
 
@@ -88,12 +90,12 @@ td {
     const now        = local_time.getTime();
 
     if (now < sunrise) {
-      g_time.innerHTML = "sunrise" + hhmm(sunrise - now);        
+      g_time.innerHTML = hhmm(sunrise - now) + " sunrise";
     } else if (now < sunset) {
-      g_time.innerHTML = "sunset" + hhmm(sunset - now); // ((sunset - now) / 1000 / 60 / 60);        
+      g_time.innerHTML = hhmm(sunset - now) + " sunset";        
     } else {
       const tomorrow_sunrise = SunCalc.getTimes(now + hrs24, lat, long).sunrise.getTime();
-      g_time.innerHTML = "sunrise" + hhmm(tomorrow_sunrise - now);        
+      g_time.innerHTML = hhmm(tomorrow_sunrise - now) + " sunrise";        
     }
       
   }
