@@ -32,53 +32,97 @@ td {
 <table>
     <tr><td>local time</td><td id="g_local_time"></td></tr>
     <tr><td>time_zone_offset</td><td><input id="g_time_zone_offset"></input></td></tr>
-    <tr><td>latitude </td><td><input id="g_lat"  value="34.1083"   ></input></td></tr>
-    <tr><td>longitude</td><td><input id="g_long" value="-117.2898" ></input></td></tr>
+    <tr><td>latitude </td><td><input id="g_lat"></input></td></tr>
+    <tr><td>longitude</td><td><input id="g_long"></input></td></tr>
     <tr><td>sunrise</td><td id="g_sunrise"></td></tr>
     <tr><td>sunset</td><td id="g_sunset"></td></tr>
-    <tr><td>light</td><td id="g_light"></td></tr>
-    <tr><td>dark</td><td id="g_dark"></td></tr>
+    <tr><td>light_remaining</td><td id="g_light_remaining"></td></tr>
+    <tr><td>dark_remaining</td><td id="g_dark_remaining"></td></tr>
 </table>
 
 <script src="suncalc.js" type="module"></script> <!-- https://github.com/mourner/suncalc -->
 
 <script type="module">
-  function update() {
-    const local_time = new Date();
-    g_time_zone_offset.value = local_time.getTimezoneOffset() / 60;
-    //const gmt        = new Date(local_time.toGMTString());
-    const lat        = parseInt(g_lat.value);
-    const long       = parseInt(g_long.value);
-    const sun        = SunCalc.getTimes(local_time, lat, long);
-    g_local_time.innerHTML = local_time;
-    g_sunrise.innerHTML    = sun.sunrise.getHours() + ':' + sun.sunrise.getMinutes() + ' am';
-    g_sunset.innerHTML     = (sun.sunset.getHours() - 12) + ':' + sun.sunset.getMinutes() + ' pm';
+  function pad(num) {
+    return num.toString().padStart(2, '0');
+  }
 
-    const hrs24      = 24 * 60 * 60 * 1000;
-    const sunrise    = sun.sunrise.getTime();
-    const sunset     = sun.sunset.getTime();
+  function hhmm(milliseconds) {
+    let seconds = Math.floor(milliseconds / 1000);
+    let minutes = Math.floor(seconds / 60);
+    let hours = Math.floor(minutes / 60);
+    seconds = seconds % 60;
+    minutes = seconds >= 30 ? minutes + 1 : minutes;
+    minutes = minutes % 60;
+    return `${pad(hours)}:${pad(minutes)}`;
+  }
+  
+  const hrs24    = 24 * 60 * 60 * 1000;
+  let lat        = 0; //34.1083;
+  let long       = 0; //-117.2898;
+  let local_time = new Date();
+
+  function update() {
+    lat  = g_lat.value; //              = lat;
+    long = g_long.value; //             = long;      
+    g_local_time.innerHTML   = local_time;
+    g_time_zone_offset.value = local_time.getTimezoneOffset() / 60;
+
+    const sun_today     = SunCalc.getTimes(local_time, lat, long);
+    g_sunrise.innerHTML = sun_today.sunrise.getHours() + ':' + sun_today.sunrise.getMinutes() + ' am';
+    g_sunset.innerHTML  = (sun_today.sunset.getHours() - 12) + ':' + sun_today.sunset.getMinutes() + ' pm';
+
+    const sunrise    = sun_today.sunrise.getTime();
+    const sunset     = sun_today.sunset.getTime();
     const now        = local_time.getTime();
     const yesterday  = now - hrs24;
 
     if (now < sunrise) {
-      g_light.innerHTML = "";
+      g_light_remaining.innerHTML = "";
       const yesterday_sunset = SunCalc.getTimes(now - hrs24, lat, long).sunset.getTime();
-      g_dark.innerHTML = Math.floor((now - yesterday_sunset) / (sunrise - yesterday_sunset) * 100);        
+      g_dark_remaining.innerHTML = Math.floor((sunrise - now) / (sunrise - yesterday_sunset) * 100);        
     } else if (now < sunset) {
-      g_dark.innerHTML = "";
-      g_light.innerHTML = Math.floor((now - sunrise) / (sunset - sunrise) * 100);        
+      g_dark_remaining.innerHTML = "";
+//      g_light_remaining.innerHTML = Math.floor((sunset - now) / (sunset - sunrise) * 100);        
+//      g_light_remaining.innerHTML = hhmm(sunset - now);        
+      g_light_remaining.innerHTML = Math.floor((sunset - now) * 1000 * 60 * 60).toFixed(2);        
     } else {
-      g_light.innerHTML = "";
+      g_light_remaining.innerHTML = "";
       const tomorrow_sunrise = SunCalc.getTimes(now + hrs24, lat, long).sunrise.getTime();
-      g_dark.innerHTML = Math.floor((now - sunset) / (tomorrow_sunrise - sunset) * 100);        
+      g_dark_remaining.innerHTML = Math.floor((now - sunset) / (tomorrow_sunrise - sunset) * 100);        
     }
       
   }
-  update();
-
   g_lat             .addEventListener('change', update);
   g_long            .addEventListener('change', update);
   g_time_zone_offset.addEventListener('change', update);
+
+  update();
+  setTimeout(update, 60 * 1000);
+
+  navigator.geolocation.getCurrentPosition(function(position) {
+    g_lat.value  = position.coords.latitude;
+    g_long.value = position.coords.longitude; //.toFixed(2);
+  });
+
+  function success(position) {
+    lat  = position.coords.latitude;
+    long = position.coords.longitude;
+    update();
+  }
+
+  function error() {
+    g_lat  = 34.1083;
+    g_long = -117.2898;      
+    update();
+  }
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(success, error);
+  } else {
+    error();
+  }
+
 </script>
     
 </body>
