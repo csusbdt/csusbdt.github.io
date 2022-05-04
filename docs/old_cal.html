@@ -1,0 +1,85 @@
+<html>
+<head>
+<title>Home</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<!--
+https://github.com/mourner/suncalc
+-->
+    
+<style>
+
+</style>
+</head>
+<body>
+    <div>
+       <label for="g_lat" >lat</label>
+       <input type="text" id="g_lat" value="34.1">
+       <br>
+        
+       <label for="g_long">long</label>
+       <input type="text" id="g_long" value="117.3">
+       <br>
+        
+       <label for="g_zone">zone</label>
+       <select id="g_zone">
+          <option value="-8">PST</option>
+       </select>
+       <br>
+        
+       <label for="g_dst" >dst </label>        
+       <input type="checkbox" id="g_dst"></input>
+       <br>
+    </div>
+    
+    <ul>
+        <li id="g_sunrise">sunrise</li>
+    </ul>
+
+    <script src="suncalc.js" type="module"></script>
+    <script type="module">
+    const SunCalc = import { SunCalc } from "./suncalc.js";
+        
+// get today's sunlight times for London
+const times = SunCalc.getTimes(new Date(), 51.5, -0.1);
+
+// format sunrise time from the Date object
+const sunriseStr = times.sunrise.getHours() + ':' + times.sunrise.getMinutes();
+
+// get position of the sun (azimuth and altitude) at today's sunrise
+const sunrisePos = SunCalc.getPosition(times.sunrise, 51.5, -0.1);
+
+// get sunrise azimuth in degrees
+const sunriseAzimuth = sunrisePos.azimuth * 180 / Math.PI;
+
+
+        
+        function update() {
+            g_sunrise.innerHTML = "" + lat + "" + long;
+        }
+        
+        let lat  = 0;
+        let long = 0;
+        /*
+        let gmt_adj = 0;
+        let dst_adj = 0;
+        */
+        g_lat.addEventListener('change', e => {
+            lat = parseFloat(g_lat.value);
+            update();
+        });
+        g_long.addEventListener('change', e => {
+            long = parseFloat(g_long.value);
+            update();
+        });
+    </script>
+
+    <script type="module">
+
+
+        
+    </script>
+
+    
+</body>
+</html>
