@@ -54,7 +54,7 @@ td {
     seconds = seconds % 60;
     minutes = seconds >= 30 ? minutes + 1 : minutes;
     minutes = minutes % 60;
-    return `${pad(hours)}:${pad(minutes)}`;
+    return `${hours}h${minutes}`;
   }
   
   const hrs24    = 24 * 60 * 60 * 1000;
@@ -85,7 +85,7 @@ td {
       g_dark_remaining.innerHTML = "";
 //      g_light_remaining.innerHTML = Math.floor((sunset - now) / (sunset - sunrise) * 100);        
 //      g_light_remaining.innerHTML = hhmm(sunset - now);        
-      g_light_remaining.innerHTML = Math.floor((sunset - now) * 1000 * 60 * 60).toFixed(2);        
+      g_light_remaining.innerHTML = hhmm(sunset - now); // ((sunset - now) / 1000 / 60 / 60);        
     } else {
       g_light_remaining.innerHTML = "";
       const tomorrow_sunrise = SunCalc.getTimes(now + hrs24, lat, long).sunrise.getTime();
@@ -97,23 +97,22 @@ td {
   g_long            .addEventListener('change', update);
   g_time_zone_offset.addEventListener('change', update);
 
-  update();
-  setTimeout(update, 60 * 1000);
-
+  /*
   navigator.geolocation.getCurrentPosition(function(position) {
     g_lat.value  = position.coords.latitude;
     g_long.value = position.coords.longitude; //.toFixed(2);
   });
-
+*/
+  
   function success(position) {
-    lat  = position.coords.latitude;
-    long = position.coords.longitude;
+    g_lat.value  = position.coords.latitude;
+    g_long.value = position.coords.longitude;
     update();
   }
 
   function error() {
-    g_lat  = 34.1083;
-    g_long = -117.2898;      
+    g_lat.value  = 34.1083;
+    g_long.value = -117.2898;      
     update();
   }
 
@@ -122,6 +121,9 @@ td {
   } else {
     error();
   }
+
+  update();
+  setTimeout(update, 60 * 1000);
 
 </script>
     
