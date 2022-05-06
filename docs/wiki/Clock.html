@@ -1,0 +1,46 @@
+<html>
+<head>
+<title>Clock</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<style>
+body {
+    background-color: #cccccc;
+    margin: 0;
+    padding: 20;
+}
+a {
+    color: black;    
+}
+</style>
+</head>
+<body>
+  <table>
+    <tr><td>latitude </td><td><input id="g_lat"></input></td></tr>
+    <tr><td>longitude</td><td><input id="g_long"></input></td></tr>
+  </table>
+  <hr>
+  <div id="g_content">
+    <div id="g_local_time"></div>
+    <div id="g_time_to"></div>
+    <div id="g_time_from"></div>
+  </div>
+  <hr>
+  <div id="wiki"></div>
+  <hr>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="./clock.js" type="module"></script>
+  <script type="module">
+    console.log(window.location.href);
+    let s = window.location.href.lastIndexOf("/");
+    let e = window.location.href.lastIndexOf(".html");
+    let n = window.location.href.substr(s + 1, e - s - 1);
+    fetch("https://raw.githubusercontent.com/wiki/csusbdt/csusbdt.github.io/" + n + ".md", {cache: "no-store"})
+    .then(response => {
+      response.text().then(text => {
+        document.getElementById('wiki').innerHTML = marked.parse(text);
+      });
+    }); 
+  </script>
+</body>
+</html>
+
