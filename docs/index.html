@@ -23,7 +23,8 @@ a {
         <div style="margin-bottom: 1em">Happy Birthday and Farewell</div>
         <audio id="g_audio" controls><source src="happy_birthday.mp3" type="audio/mpeg"></audio>
         <div style="margin-top: 3em">
-            <a id="g_blog" href="wiki/Blog.html">Blog</a>
+            <a id="g_blog" href="wiki/Blog.html">Blog</a><br>
+            <a id="g_clock" href="wiki/Clock.html">Clock</a><br>
         </div>
     </div>
     
@@ -40,6 +41,13 @@ a {
                 g_blog.removeAttribute('target');                
             } else {
                 g_blog.setAttribute('target', '_blank');
+            }
+        });
+        g_clock.addEventListener('click', e => {
+            if (g_audio.paused) {
+                g_clock.removeAttribute('target');                
+            } else {
+                g_clock.setAttribute('target', '_blank');
             }
         });
     </script>
