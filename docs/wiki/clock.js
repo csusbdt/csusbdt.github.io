@@ -43,7 +43,7 @@ function guess_longitude(date) {
 
 // init
 
-let date = new Date();
+//let date = new Date();
 let lat  = null;
 let long = null;
 
@@ -67,7 +67,7 @@ if (lat === null) {
 if (long === null) {
   long = parseFloat(localStorage.getItem('clock.long'));
   if (isNaN(long)) {
-    long = guess_longitude(date);
+    long = guess_longitude(new Date());
   }  
 }
 
@@ -75,38 +75,43 @@ g_lat.value  = lat;
 g_long.value = long;
 
 function update() {
-  date = new Date();  
-  g_local_time.innerHTML = time_string(date);
-  const sun_today  = SunCalc.getTimes(date, lat, long);
-  const sunrise    = sun_today.sunrise.getTime();
-  const sunset     = sun_today.sunset.getTime();
-  const now        = date.getTime();
-  if (now < sunrise) {
-    g_time.innerHTML = hhmm(sunrise - now) + " to sunrise";
-  } else if (now < sunset) {
-    g_time.innerHTML = hhmm(sunset - now) + " to sunset";        
-  } else {
-    const tomorrow_sunrise = SunCalc.getTimes(now + hrs24, lat, long).sunrise.getTime();
-    g_time.innerHTML = hhmm(tomorrow_sunrise - now) + " to sunrise";        
-  }  
+  const today            = new Date();
+  const yesterday        = new Date(today.getTime() - milliseconds_per_day);
+  const tomorrow         = new Date(today.getTime() + milliseconds_per_day);
+  const sun_today        = SunCalc.getTimes(today    , lat, long);
+  const sun_yesterday    = SunCalc.getTimes(yesterday, lat, long);
+  const sun_tomorrow     = SunCalc.getTimes(tomorrow , lat, long);
+
+  const now              = today                .getTime();
+  const today_sunset     = sun_today    .sunset .getTime();
+  const today_sunrise    = sun_today    .sunrise.getTime();
+  const yesterday_sunset = sun_yesterday.sunset .getTime();
+  const tomorrow_sunrise = sun_tomorrow .sunrise.getTime();
+
+  g_local_time.innerHTML = time_string(today);
+  if (now < today_sunrise) {
+    g_time_from.innerHTML = hhmm(now - yesterday_sunset) + " from sunset";
+    g_time_to.innerHTML   = hhmm(today_sunrise    - now) + " to sunrise";
+  } else if (now < today_sunset) {
+    g_time_from.innerHTML = hhmm(now - today_sunrise   ) + " from sunrise";
+    g_time_to.innerHTML   = hhmm(today_sunset     - now) + " to sunset";
+  } else { // now > today_sunset
+    g_time_from.innerHTML = hhmm(now - today_sunset    ) + " from sunset";
+    g_time_to.innerHTML   = hhmm(tomorrow_sunrise - now) + " to sunrise";    
+  }
 }
 
 update();
 setTimeout(update, 60 * 1000);
 
+g_lat.addEventListener('change', _ => {
+  lat = parseFloat(g_lat.value);
+  localStorage.setItem('clock.lat', lat);
+  update();
+});
 
-// notes
-
-//  let local_time             = get_local_time(); //new Date();
-
-  g_lat.addEventListener('change', _ => {
-    lat = parseFloat(g_lat.value);
-    localStorage.setItem('clock.lat', lat);
-    update();
-  });
-  
-  g_long.addEventListener('change', _ => {
-    long = parseFloat(g_long.value);
-    localStorage.setItem('clock.long', long);
-    update();
-  });
+g_long.addEventListener('change', _ => {
+  long = parseFloat(g_long.value);
+  localStorage.setItem('clock.long', long);
+  update();
+});
