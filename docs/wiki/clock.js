@@ -90,19 +90,19 @@ function update() {
 
   g_local_time.innerHTML = time_string(today);
   if (now < today_sunrise) {
-    g_time_from.innerHTML = hhmm(now - yesterday_sunset) + " from sunset";
-    g_time_to.innerHTML   = hhmm(today_sunrise    - now) + " to sunrise";
+    g_time_from.innerHTML = "-" + hhmm(now - yesterday_sunset) + " sunset" ;
+    g_time_to.innerHTML   = "+" + hhmm(today_sunrise    - now) + " sunrise";
   } else if (now < today_sunset) {
-    g_time_from.innerHTML = hhmm(now - today_sunrise   ) + " from sunrise";
-    g_time_to.innerHTML   = hhmm(today_sunset     - now) + " to sunset";
+    g_time_from.innerHTML = "-" + hhmm(now - today_sunrise   ) + " sunrise";
+    g_time_to.innerHTML   = "+" + hhmm(today_sunset     - now) + " sunset" ;
   } else { // now > today_sunset
-    g_time_from.innerHTML = hhmm(now - today_sunset    ) + " from sunset";
-    g_time_to.innerHTML   = hhmm(tomorrow_sunrise - now) + " to sunrise";    
+    g_time_from.innerHTML = "-" + hhmm(now - today_sunset    ) + " sunset" ;
+    g_time_to.innerHTML   = "+" + hhmm(tomorrow_sunrise - now) + " sunrise";    
   }
 }
 
 update();
-setTimeout(update, 60 * 1000);
+setInterval(update, 60 * 1000);
 
 g_lat.addEventListener('change', _ => {
   lat = parseFloat(g_lat.value);
