@@ -41,6 +41,23 @@ function guess_longitude(date) {
     return -date.getTimezoneOffset() / 60 * 15;    
 }
 
+function draw_disk(color, p) {
+  const ctx = g_canvas.getContext('2d');
+  ctx.clearRect(0, 0, g_canvas.width, g_canvas.height);
+  ctx.beginPath();
+  ctx.fillStyle = color;
+  ctx.arc(25, 25, 25, 0, p * 2 * Math.PI, false);
+  ctx.fill();
+}
+
+function draw_daytime(p) {
+  draw_disk("#ff6", p);
+}
+
+function draw_nighttime(p) {
+  draw_disk("#444", p);
+}
+
 // init
 
 //let date = new Date();
@@ -92,12 +109,15 @@ function update() {
   if (now < today_sunrise) {
     g_time_from.innerHTML = "-" + hhmm(now - yesterday_sunset) + " sunset" ;
     g_time_to.innerHTML   = "+" + hhmm(today_sunrise    - now) + " sunrise";
+    draw_nighttime((today_sunrise - now)/(today_sunrise - yesterday_sunset));
   } else if (now < today_sunset) {
     g_time_from.innerHTML = "-" + hhmm(now - today_sunrise   ) + " sunrise";
     g_time_to.innerHTML   = "+" + hhmm(today_sunset     - now) + " sunset" ;
+    draw_daytime((today_sunset - now)/(today_sunset - today_sunrise));
   } else { // now > today_sunset
     g_time_from.innerHTML = "-" + hhmm(now - today_sunset    ) + " sunset" ;
     g_time_to.innerHTML   = "+" + hhmm(tomorrow_sunrise - now) + " sunrise";    
+    draw_nighttime((tomorrow_sunrise - now)/(tomorrow_sunrise - today_sunset));
   }
 }
 

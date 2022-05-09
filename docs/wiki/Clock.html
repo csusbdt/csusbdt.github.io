@@ -11,6 +11,16 @@ body {
 a {
     color: black;    
 }
+#g_canvas {
+  margin-left: 2em;
+}
+.container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+}
 </style>
 </head>
 <body>
@@ -18,12 +28,16 @@ a {
   <div id="coords">
     lat: xxx long: yyy <a href="test">edit</a>
   </div>
-  <hr>
   -->
-  <div id="g_content">
-    <div id="g_time_from"></div>
-    <div id="g_local_time"></div>
-    <div id="g_time_to"></div>
+  <div class="container">
+    <div>
+      <div id="g_time_from"></div>
+      <div id="g_local_time"></div>
+      <div id="g_time_to"></div>
+    </div>
+    <div style="text-align: center">
+      <canvas id="g_canvas" width="50" height="50"></canvas>    
+    </div>
   </div>
   <hr>
   <table>
