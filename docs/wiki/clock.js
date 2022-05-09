@@ -45,8 +45,9 @@ function draw_disk(color, p) {
   const ctx = g_canvas.getContext('2d');
   ctx.clearRect(0, 0, g_canvas.width, g_canvas.height);
   ctx.beginPath();
-  ctx.fillStyle = color;
-  ctx.arc(25, 25, 25, 0, p * 2 * Math.PI, false);
+  ctx.arc (25, 25, 25, 0, p * 2 * Math.PI);
+  ctx.lineTo (25, 25) ;
+  ctx.fillStyle = color ;
   ctx.fill();
 }
 
@@ -60,7 +61,6 @@ function draw_nighttime(p) {
 
 // init
 
-//let date = new Date();
 let lat  = null;
 let long = null;
 
