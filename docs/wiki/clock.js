@@ -17,7 +17,7 @@ function hhmm(milliseconds) {
   seconds = seconds % 60;
   minutes = seconds >= 30 ? minutes + 1 : minutes;
   minutes = minutes % 60;
-  return `${hours}h${minutes}`;
+  return `${hours}h${minutes}m`;
 }
 
 function hours_string(milliseconds) {
@@ -55,12 +55,16 @@ function draw_disk(color, p) {
   ctx.fill();
 }
 
-function draw_daytime(p) {
+function draw_twilight(p) {
+  draw_disk("#73b4f3", p);
+}
+
+function draw_day(p) {
   draw_disk("#ff6", p);
 }
 
-function draw_nighttime(p) {
-  draw_disk("#444", p);
+function draw_night(p) {
+  draw_disk("#333", p);
 }
 
 // init
@@ -96,32 +100,36 @@ g_lat.value  = lat;
 g_long.value = long;
 
 function update() {
-  const today            = new Date();
-  const yesterday        = new Date(today.getTime() - milliseconds_per_day);
-  const tomorrow         = new Date(today.getTime() + milliseconds_per_day);
-  const sun_today        = SunCalc.getTimes(today    , lat, long);
-  const sun_yesterday    = SunCalc.getTimes(yesterday, lat, long);
-  const sun_tomorrow     = SunCalc.getTimes(tomorrow , lat, long);
+  const date  = new Date();
+  const ydate = new Date(date.getTime() - milliseconds_per_day);
+  const tdate = new Date(date.getTime() + milliseconds_per_day);
+  
+  const now            = date.getTime();      
+  const sun            = SunCalc.getTimes(date, lat, long);
+  const dawn           = sun.dawn.getTime();
+  const sunrise        = sun.sunrise.getTime();
+  const sunset         = sun.sunset.getTime();
+  const dusk           = sun.dusk.getTime();      
+  const yesterday_dusk = SunCalc.getTimes(ydate, lat, long).dusk.getTime();
+  const tomorrow_dawn  = SunCalc.getTimes(tdate, lat, long).dawn.getTime();
 
-  const now              = today                .getTime();
-  const today_sunset     = sun_today    .sunset .getTime();
-  const today_sunrise    = sun_today    .sunrise.getTime();
-  const yesterday_sunset = sun_yesterday.sunset .getTime();
-  const tomorrow_sunrise = sun_tomorrow .sunrise.getTime();
+  g_local_time.innerHTML = time_string(date);
 
-  g_local_time.innerHTML = time_string(today);
-  if (now < today_sunrise) {
-    g_time_from.innerHTML = hhmm(now - yesterday_sunset) + " from sunset" ;
-    g_time_to.innerHTML   = hhmm(today_sunrise    - now) + " to sunrise";
-    draw_nighttime((today_sunrise - now)/(today_sunrise - yesterday_sunset));
-  } else if (now < today_sunset) {
-    g_time_from.innerHTML = hhmm(now - today_sunrise   ) + " from sunrise";
-    g_time_to.innerHTML   = hhmm(today_sunset     - now) + " to sunset" ;
-    draw_daytime((today_sunset - now)/(today_sunset - today_sunrise));
-  } else { // now > today_sunset
-    g_time_from.innerHTML = hhmm(now - today_sunset    ) + " from sunset" ;
-    g_time_to.innerHTML   = hhmm(tomorrow_sunrise - now) + " to sunrise";    
-    draw_nighttime((tomorrow_sunrise - now)/(tomorrow_sunrise - today_sunset));
+  if (now < dawn) {
+    draw_night((dawn - now)/(dawn - yesterday_dusk));
+    g_time_remaining.innerHTML = hhmm(dawn - now);
+  } else if (now < sunrise) {
+    draw_twilight((dusk - now)/(dusk - dawn));
+    g_time_remaining.innerHTML = hhmm(dusk - now);
+  } else if (now < sunset) {
+    draw_day((dusk - now)/(dusk - dawn));
+    g_time_remaining.innerHTML = hhmm(dusk - now);
+  } else if (now < dusk) {
+    draw_twilight((dusk - now)/(dusk - dawn));
+    g_time_remaining.innerHTML = hhmm(dusk - now);
+  } else {
+    draw_night((tomorrow_dawn - now)/(tomorrow_dawn - dusk));
+    g_time_remaining.innerHTML = hhmm(tomorrow_dawn - now);
   }
 }
 

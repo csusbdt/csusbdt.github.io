@@ -12,7 +12,8 @@ a {
     color: black;    
 }
 #g_canvas {
-  margin-left: 2em;
+  margin-left: 1.0em;
+  margin-right: 1.0em;
 }
 .container {
   display: flex;
@@ -24,20 +25,12 @@ a {
 </style>
 </head>
 <body>
-  <!--
-  <div id="coords">
-    lat: xxx long: yyy <a href="test">edit</a>
-  </div>
-  -->
   <div class="container">
-    <div>
-      <div id="g_time_from"></div>
-      <div id="g_local_time"></div>
-      <div id="g_time_to"></div>
-    </div>
+    <div id="g_local_time"></div>
     <div style="text-align: center">
       <canvas id="g_canvas" width="50" height="50"></canvas>    
     </div>
+    <div id="g_time_remaining"></div>
   </div>
   <hr>
   <table>
