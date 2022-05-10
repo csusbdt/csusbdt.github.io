@@ -17,7 +17,11 @@ function hhmm(milliseconds) {
   seconds = seconds % 60;
   minutes = seconds >= 30 ? minutes + 1 : minutes;
   minutes = minutes % 60;
-  return `${hours}h${minutes}m`;
+  return `${hours}h${minutes}`;
+}
+
+function hours_string(milliseconds) {
+  return Number.parseFloat(milliseconds/1000/60/60).toFixed(1);
 }
 
 function time_string(date) {
@@ -107,16 +111,16 @@ function update() {
 
   g_local_time.innerHTML = time_string(today);
   if (now < today_sunrise) {
-    g_time_from.innerHTML = "-" + hhmm(now - yesterday_sunset) + " sunset" ;
-    g_time_to.innerHTML   = "+" + hhmm(today_sunrise    - now) + " sunrise";
+    g_time_from.innerHTML = hhmm(now - yesterday_sunset) + " from sunset" ;
+    g_time_to.innerHTML   = hhmm(today_sunrise    - now) + " to sunrise";
     draw_nighttime((today_sunrise - now)/(today_sunrise - yesterday_sunset));
   } else if (now < today_sunset) {
-    g_time_from.innerHTML = "-" + hhmm(now - today_sunrise   ) + " sunrise";
-    g_time_to.innerHTML   = "+" + hhmm(today_sunset     - now) + " sunset" ;
+    g_time_from.innerHTML = hhmm(now - today_sunrise   ) + " from sunrise";
+    g_time_to.innerHTML   = hhmm(today_sunset     - now) + " to sunset" ;
     draw_daytime((today_sunset - now)/(today_sunset - today_sunrise));
   } else { // now > today_sunset
-    g_time_from.innerHTML = "-" + hhmm(now - today_sunset    ) + " sunset" ;
-    g_time_to.innerHTML   = "+" + hhmm(tomorrow_sunrise - now) + " sunrise";    
+    g_time_from.innerHTML = hhmm(now - today_sunset    ) + " from sunset" ;
+    g_time_to.innerHTML   = hhmm(tomorrow_sunrise - now) + " to sunrise";    
     draw_nighttime((tomorrow_sunrise - now)/(tomorrow_sunrise - today_sunset));
   }
 }
