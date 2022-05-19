@@ -12,7 +12,6 @@ a {
     color: black;    
 }
 canvas {
-  margin-left: 1.0em;
   margin-right: 1.0em;
 }
 .container {
@@ -21,6 +20,7 @@ canvas {
   flex-wrap: wrap;
   justify-content: flex-start;
   align-items: center;
+  margin: 0;
 }
 .container div {
     margin-left: 1.0em;
@@ -29,17 +29,12 @@ canvas {
 </head>
 <body>
   <div class="container">
-    <div id="g_local_time"></div>
-    <div style="text-align: center">
+    <div style="text-align: center; margin-left: 0">
       <canvas id="g_canvas" width="50" height="50"></canvas>    
     </div>
     <div id="g_time_remaining"></div>
+    <div id="g_local_time"></div>
     <div id="g_season"></div>
-    <!--
-    <div style="text-align: center">
-      <canvas id="g_canvas_2" width="50" height="50"></canvas>    
-    </div>
-    -->
   </div>
   <hr>
   <table>
@@ -57,7 +52,7 @@ canvas {
     let s = window.location.href.lastIndexOf("/");
     let e = window.location.href.lastIndexOf(".html");
     let n = window.location.href.substr(s + 1, e - s - 1);
-    fetch("https://raw.githubusercontent.com/wiki/csusbdt/csusbdt.github.io/" + n + ".md", {cache: "no-store"})
+    fetch("https://raw.githubusercontent.com/wiki/csusbdt/csusbdt.github.io/Clock.md", {cache: "no-store"})
     .then(response => {
       response.text().then(text => {
         document.getElementById('wiki').innerHTML = marked.parse(text);

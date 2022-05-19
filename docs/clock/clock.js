@@ -17,7 +17,7 @@ function hhmm(milliseconds) {
   seconds = seconds % 60;
   minutes = seconds >= 30 ? minutes + 1 : minutes;
   minutes = minutes % 60;
-  return `${hours}h${minutes}m`;
+  return `${hours}h${minutes}`;
 }
 
 function hours_string(milliseconds) {
@@ -34,9 +34,9 @@ function time_string(date) {
   if (date.getMinutes() < 10) s += "0";
   s += date.getMinutes();
   if (date.getHours() < 12) {
-    s += " am"; 
+    s += "am"; 
   } else {
-    s += " pm";
+    s += "pm";
   }
   return s;
 }
@@ -46,7 +46,6 @@ function guess_longitude(date) {
 }
 
 function draw_disk(ctx, color, p) {
-//  const ctx = g_canvas.getContext('2d');
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.beginPath();
   ctx.arc (25, 25, 25, 0, p * 2 * Math.PI);
@@ -61,27 +60,10 @@ function draw_twilight(p) {
 
 function draw_day(p) {
   draw_disk(g_canvas.getContext('2d'), "#ff6", p);
-//  draw_disk("#ff6", p);
 }
 
 function draw_night(p) {
   draw_disk(g_canvas.getContext('2d'), "#333", p);
-//  draw_disk("#333", p);
-}
-
-function draw_season() {
-  const now  = new Date();
-  const jde  = A.Solistice.june(now.getFullYear());
-  const jdo  = A.JulianDay.jdFromJDE(jde);
-  const sol  = jdo.toDate();
-
-  const t = now.getTime();
-  const s = sol.getTime();
-  if (t < s) {
-	  g_season.innerHTML = "-" + Math.round((s - t) / 1000 / 60 / 60 / 24);
-  } else {
-	  g_season.innerHTML = "+" + Math.round((t - s) / 1000 / 60 / 60 / 24);
-  }
 }
 
 // init
@@ -134,19 +116,19 @@ function update() {
 
   if (now < dawn) {
     draw_night((dawn - now)/(dawn - yesterday_dusk));
-    g_time_remaining.innerHTML = hhmm(dawn - now);
+    g_time_remaining.innerHTML = hhmm(dawn - now) + "->light";
   } else if (now < sunrise) {
     draw_twilight((dusk - now)/(dusk - dawn));
-    g_time_remaining.innerHTML = hhmm(dusk - now);
+    g_time_remaining.innerHTML = hhmm(dusk - now) + "->light";
   } else if (now < sunset) {
     draw_day((dusk - now)/(dusk - dawn));
-    g_time_remaining.innerHTML = hhmm(dusk - now);
+    g_time_remaining.innerHTML = hhmm(dusk - now) + "->dark";
   } else if (now < dusk) {
     draw_twilight((dusk - now)/(dusk - dawn));
-    g_time_remaining.innerHTML = hhmm(dusk - now);
+    g_time_remaining.innerHTML = hhmm(dusk - now) + "->dark";
   } else {
     draw_night((tomorrow_dawn - now)/(tomorrow_dawn - dusk));
-    g_time_remaining.innerHTML = hhmm(tomorrow_dawn - now);
+    g_time_remaining.innerHTML = hhmm(tomorrow_dawn - now) + "->light";
   }
 }
 
@@ -165,5 +147,42 @@ g_long.addEventListener('change', _ => {
   update();
 });
 
+// season
+
+function draw_season() {
+  const now  = new Date();
+  const march_de     = A.Solistice.march(now.getFullYear());
+  const march_do     = A.JulianDay.jdFromJDE(march_de);
+  const march        = march_do.toDate();
+  const june_de      = A.Solistice.june(now.getFullYear());
+  const june_do      = A.JulianDay.jdFromJDE(june_de);
+  const june         = june_do.toDate();
+  const september_de = A.Solistice.september(now.getFullYear());
+  const september_do = A.JulianDay.jdFromJDE(september_de);
+  const september    = september_do.toDate();
+  const december_de  = A.Solistice.december(now.getFullYear());
+  const december_do  = A.JulianDay.jdFromJDE(december_de);
+  const december     = december_do.toDate();
+  const march2_de    = A.Solistice.march(now.getFullYear() + 1);
+  const march2_do    = A.JulianDay.jdFromJDE(march2_de);
+  const march2       = march2_do.toDate();
+  const n  = now.getTime();
+  const m  = march.getTime();
+  const j  = june.getTime();
+  const s  = september.getTime();
+  const d  = december.getTime();
+  const m2 = march2.getTime();
+  if (n < m) {
+	  g_season.innerHTML = Math.round((m  - n) / 1000 / 60 / 60 / 24) + "->spr";
+  } else if (n < j) {
+	  g_season.innerHTML = Math.round((j  - n) / 1000 / 60 / 60 / 24) + "->sum";
+  } else if (n < s) {
+	  g_season.innerHTML = Math.round((s  - n) / 1000 / 60 / 60 / 24) + "->aut";
+  } else if (n < d) {
+	  g_season.innerHTML = Math.round((d  - n) / 1000 / 60 / 60 / 24) + "->win";
+  } else {
+	  g_season.innerHTML = Math.round((m2 - n) / 1000 / 60 / 60 / 24) + "->spr";
+  }
+}
 
 draw_season();
