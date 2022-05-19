@@ -45,9 +45,9 @@ function guess_longitude(date) {
     return -date.getTimezoneOffset() / 60 * 15;    
 }
 
-function draw_disk(color, p) {
-  const ctx = g_canvas.getContext('2d');
-  ctx.clearRect(0, 0, g_canvas.width, g_canvas.height);
+function draw_disk(ctx, color, p) {
+//  const ctx = g_canvas.getContext('2d');
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.beginPath();
   ctx.arc (25, 25, 25, 0, p * 2 * Math.PI);
   ctx.lineTo (25, 25) ;
@@ -56,15 +56,32 @@ function draw_disk(color, p) {
 }
 
 function draw_twilight(p) {
-  draw_disk("#73b4f3", p);
+  draw_disk(g_canvas.getContext('2d'), "#73b4f3", p);
 }
 
 function draw_day(p) {
-  draw_disk("#ff6", p);
+  draw_disk(g_canvas.getContext('2d'), "#ff6", p);
+//  draw_disk("#ff6", p);
 }
 
 function draw_night(p) {
-  draw_disk("#333", p);
+  draw_disk(g_canvas.getContext('2d'), "#333", p);
+//  draw_disk("#333", p);
+}
+
+function draw_season() {
+  const now  = new Date();
+  const jde  = A.Solistice.june(now.getFullYear());
+  const jdo  = A.JulianDay.jdFromJDE(jde);
+  const sol  = jdo.toDate();
+
+  const t = now.getTime();
+  const s = sol.getTime();
+  if (t < s) {
+	  g_season.innerHTML = "-" + Math.round((s - t) / 1000 / 60 / 60 / 24);
+  } else {
+	  g_season.innerHTML = "+" + Math.round((t - s) / 1000 / 60 / 60 / 24);
+  }
 }
 
 // init
@@ -147,3 +164,6 @@ g_long.addEventListener('change', _ => {
   localStorage.setItem('clock.long', long);
   update();
 });
+
+
+draw_season();

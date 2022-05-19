@@ -11,7 +11,7 @@ body {
 a {
     color: black;    
 }
-#g_canvas {
+canvas {
   margin-left: 1.0em;
   margin-right: 1.0em;
 }
@@ -22,6 +22,9 @@ a {
   justify-content: flex-start;
   align-items: center;
 }
+.container div {
+    margin-left: 1.0em;
+}
 </style>
 </head>
 <body>
@@ -31,6 +34,12 @@ a {
       <canvas id="g_canvas" width="50" height="50"></canvas>    
     </div>
     <div id="g_time_remaining"></div>
+    <div id="g_season"></div>
+    <!--
+    <div style="text-align: center">
+      <canvas id="g_canvas_2" width="50" height="50"></canvas>    
+    </div>
+    -->
   </div>
   <hr>
   <table>
@@ -41,6 +50,7 @@ a {
   <div id="wiki"></div>
   <hr>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="./meuusjs.1.0.3.min.js"></script>
   <script src="./clock.js" type="module"></script>
   <script type="module">
     console.log(window.location.href);
