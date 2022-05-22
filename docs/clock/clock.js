@@ -115,21 +115,22 @@ function update() {
   g_local_time.innerHTML = time_string(date);
 
   if (now < dawn) {
-    draw_night((dawn - now)/(dawn - yesterday_dusk));
+    //draw_night((dawn - now)/(dawn - yesterday_dusk));
     g_time_remaining.innerHTML = hhmm(dawn - now) + "->light";
   } else if (now < sunrise) {
-    draw_twilight((dusk - now)/(dusk - dawn));
+    //draw_twilight((dusk - now)/(dusk - dawn));
     g_time_remaining.innerHTML = hhmm(dusk - now) + "->light";
   } else if (now < sunset) {
-    draw_day((dusk - now)/(dusk - dawn));
+    //draw_day((dusk - now)/(dusk - dawn));
     g_time_remaining.innerHTML = hhmm(dusk - now) + "->dark";
   } else if (now < dusk) {
-    draw_twilight((dusk - now)/(dusk - dawn));
+    //draw_twilight((dusk - now)/(dusk - dawn));
     g_time_remaining.innerHTML = hhmm(dusk - now) + "->dark";
   } else {
-    draw_night((tomorrow_dawn - now)/(tomorrow_dawn - dusk));
+    //draw_night((tomorrow_dawn - now)/(tomorrow_dawn - dusk));
     g_time_remaining.innerHTML = hhmm(tomorrow_dawn - now) + "->light";
   }
+  draw_day_circle((dusk - dawn) / 24 / 60 / 60 / 1000);
 }
 
 update();
@@ -186,3 +187,17 @@ function draw_season() {
 }
 
 draw_season();
+
+function draw_day_circle(p) {
+  const ctx = g_canvas.getContext('2d');
+
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.beginPath();
+  const cx = ctx.canvas.width  / 2;
+  const cy = ctx.canvas.height / 2;
+  const r  = ctx.canvas.width  / 2;
+  ctx.arc (cx, cy, r, 0, (1 - p) * 2 * Math.PI, true);
+  ctx.lineTo(cx, cy);
+  ctx.fillStyle = "#ff6";
+  ctx.fill();
+}
