@@ -44,28 +44,6 @@ function time_string(date) {
 function guess_longitude(date) {
     return -date.getTimezoneOffset() / 60 * 15;    
 }
-/*
-function draw_disk(ctx, color, p) {
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  ctx.beginPath();
-  ctx.arc (25, 25, 25, 0, p * 2 * Math.PI);
-  ctx.lineTo (25, 25) ;
-  ctx.fillStyle = color ;
-  ctx.fill();
-}
-
-function draw_twilight(p) {
-  draw_disk(g_canvas.getContext('2d'), "#73b4f3", p);
-}
-
-function draw_day(p) {
-  draw_disk(g_canvas.getContext('2d'), "#ff6", p);
-}
-
-function draw_night(p) {
-  draw_disk(g_canvas.getContext('2d'), "#333", p);
-}
-*/
 
 // init
 
@@ -116,25 +94,17 @@ function update() {
   g_local_time.innerHTML = time_string(date);
 
   if (now < dawn) {
-    //draw_night((dawn - now)/(dawn - yesterday_dusk));
     g_time_remaining.innerHTML = hhmm(dawn - now) + "->light";
   } else if (now < sunrise) {
-    //draw_twilight((dusk - now)/(dusk - dawn));
     g_time_remaining.innerHTML = hhmm(dusk - now) + "->light";
   } else if (now < sunset) {
-    //draw_day((dusk - now)/(dusk - dawn));
     g_time_remaining.innerHTML = hhmm(dusk - now) + "->dark";
   } else if (now < dusk) {
-    //draw_twilight((dusk - now)/(dusk - dawn));
     g_time_remaining.innerHTML = hhmm(dusk - now) + "->dark";
   } else {
-    //draw_night((tomorrow_dawn - now)/(tomorrow_dawn - dusk));
     g_time_remaining.innerHTML = hhmm(tomorrow_dawn - now) + "->light";
-  }
-  
-//  draw_day_circle((dusk - dawn) / 24 / 60 / 60 / 1000);
+  }  
   draw_clock();
-  
 }
 
 update();
@@ -242,17 +212,21 @@ function draw_clock() {
   ctx.fill();
   
   ctx.beginPath();
-  ctx.arc (cx, cy, r, end_angle, start_angle);
+  ctx.arc(cx, cy, r, end_angle, start_angle);
   ctx.lineTo(cx, cy);
   ctx.fillStyle = "#000";
   ctx.fill();
   
   ctx.beginPath();
-  ctx.arc (cx, cy, r, start_angle, Math.PI - sliver + t * 2*Math.PI);
+  ctx.arc(cx, cy, r, start_angle, Math.PI - sliver + t * 2*Math.PI);
   ctx.lineTo(cx, cy);
-//  ctx.fillStyle = "#DAF7A6";
-  ctx.fillStyle = "#cccccc";
+  ctx.fillStyle = "#ddd";
   ctx.fill();
+  
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+  ctx.strokeStyle = "#ddd";
+  ctx.stroke(); 
 
 /*  
   const a = Math.PI - sliver + t * 2*Math.PI;
