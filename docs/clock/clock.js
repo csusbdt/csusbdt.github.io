@@ -44,7 +44,7 @@ function time_string(date) {
 function guess_longitude(date) {
     return -date.getTimezoneOffset() / 60 * 15;    
 }
-
+/*
 function draw_disk(ctx, color, p) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.beginPath();
@@ -65,6 +65,7 @@ function draw_day(p) {
 function draw_night(p) {
   draw_disk(g_canvas.getContext('2d'), "#333", p);
 }
+*/
 
 // init
 
@@ -130,7 +131,10 @@ function update() {
     //draw_night((tomorrow_dawn - now)/(tomorrow_dawn - dusk));
     g_time_remaining.innerHTML = hhmm(tomorrow_dawn - now) + "->light";
   }
-  draw_day_circle((dusk - dawn) / 24 / 60 / 60 / 1000);
+  
+//  draw_day_circle((dusk - dawn) / 24 / 60 / 60 / 1000);
+  draw_clock();
+  
 }
 
 update();
@@ -190,14 +194,71 @@ draw_season();
 
 function draw_day_circle(p) {
   const ctx = g_canvas.getContext('2d');
-
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.beginPath();
   const cx = ctx.canvas.width  / 2;
   const cy = ctx.canvas.height / 2;
-  const r  = ctx.canvas.width  / 2;
-  ctx.arc (cx, cy, r, 0, (1 - p) * 2 * Math.PI, true);
+  const r  = ctx.canvas.width  / 2;  
+  const sliver = (p - .5) / 2 * 2*Math.PI;
+  const start_angle = sliver;
+  const end_angle   = Math.PI - sliver;
+  ctx.arc (cx, cy, r, end_angle, start_angle);
   ctx.lineTo(cx, cy);
   ctx.fillStyle = "#ff6";
   ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo()
+}
+
+function draw_clock() {
+  const date  = new Date();
+  const ydate = new Date(date.getTime() - milliseconds_per_day);
+  const tdate = new Date(date.getTime() + milliseconds_per_day);
+
+  const today_sun      = SunCalc.getTimes( date, lat, long);
+  const yesterday_sun  = SunCalc.getTimes(ydate, lat, long);
+  const now            = date.getTime();
+  let t = null;
+  if (now < today_sun.dawn.getTime()) {
+    t = (now - yesterday_sun.dawn.getTime()) / milliseconds_per_day;
+  } else {
+    t = (now - today_sun.dawn.getTime()) / milliseconds_per_day;    
+  }
+
+  const p = (today_sun.dusk.getTime() - today_sun.dawn.getTime()) / milliseconds_per_day;
+
+  const ctx = g_canvas.getContext('2d');
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.beginPath();
+  const cx = ctx.canvas.width  / 2;
+  const cy = ctx.canvas.height / 2;
+  const r  = ctx.canvas.width  / 2;  
+  const sliver = (p - .5) / 2 * 2*Math.PI;
+  const start_angle = Math.PI - sliver;
+  const end_angle   = sliver;
+  ctx.arc (cx, cy, r, start_angle, end_angle);
+  ctx.lineTo(cx, cy);
+  ctx.fillStyle = "#ff6";
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.arc (cx, cy, r, end_angle, start_angle);
+  ctx.lineTo(cx, cy);
+  ctx.fillStyle = "#000";
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.arc (cx, cy, r, start_angle, Math.PI - sliver + t * 2*Math.PI);
+  ctx.lineTo(cx, cy);
+//  ctx.fillStyle = "#DAF7A6";
+  ctx.fillStyle = "#cccccc";
+  ctx.fill();
+
+/*  
+  const a = Math.PI - sliver + t * 2*Math.PI;
+  ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
+  ctx.lineTo(cx, cy);
+  ctx.strokeStyle = "#000";
+  ctx.stroke(); 
+  */
 }
