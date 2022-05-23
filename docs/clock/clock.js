@@ -214,25 +214,24 @@ function draw_clock() {
   ctx.beginPath();
   ctx.arc(cx, cy, r, end_angle, start_angle);
   ctx.lineTo(cx, cy);
-  ctx.fillStyle = "#000";
+  ctx.fillStyle = "#333";
   ctx.fill();
   
   ctx.beginPath();
   ctx.arc(cx, cy, r, start_angle, Math.PI - sliver + t * 2*Math.PI);
   ctx.lineTo(cx, cy);
-  ctx.fillStyle = "#ddd";
+  ctx.fillStyle = "#999";
   ctx.fill();
   
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-  ctx.strokeStyle = "#ddd";
-  ctx.stroke(); 
+//  ctx.beginPath();
+//  ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+//  ctx.strokeStyle = "#000";
+//  ctx.stroke(); 
 
-/*  
-  const a = Math.PI - sliver + t * 2*Math.PI;
-  ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
-  ctx.lineTo(cx, cy);
-  ctx.strokeStyle = "#000";
-  ctx.stroke(); 
-  */
+//  const a = Math.PI - sliver + t * 2*Math.PI;
+//  ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
+//  ctx.lineTo(cx, cy);
+//  ctx.strokeStyle = "#000";
+//  ctx.stroke(); 
 }
+
