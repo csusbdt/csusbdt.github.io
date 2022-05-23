@@ -91,7 +91,7 @@ function update() {
   const yesterday_dusk = SunCalc.getTimes(ydate, lat, long).dusk.getTime();
   const tomorrow_dawn  = SunCalc.getTimes(tdate, lat, long).dawn.getTime();
 
-  g_local_time.innerHTML = time_string(date);
+  //g_local_time.innerHTML = time_string(date);
 
   if (now < dawn) {
     g_time_remaining.innerHTML = hhmm(dawn - now) + "->light";
