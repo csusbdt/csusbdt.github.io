@@ -202,13 +202,13 @@ function draw_clock() {
   ctx.beginPath();
   const cx = ctx.canvas.width  / 2;
   const cy = ctx.canvas.height / 2;
-  const r  = ctx.canvas.width  / 2;  
+  const r  = ctx.canvas.width  / 2 * .83;
   const sliver = (p - .5) / 2 * 2*Math.PI;
   const start_angle = Math.PI - sliver;
   const end_angle   = sliver;
   ctx.arc (cx, cy, r, start_angle, end_angle);
   ctx.lineTo(cx, cy);
-  ctx.fillStyle = "#ff6";
+  ctx.fillStyle = "#FAF25C";
   ctx.fill();
   
   ctx.beginPath();
@@ -221,6 +221,15 @@ function draw_clock() {
   ctx.arc(cx, cy, r, start_angle, Math.PI - sliver + t * 2*Math.PI);
   ctx.lineTo(cx, cy);
   ctx.fillStyle = "#999";
+  ctx.fill();
+
+  const a = Math.PI - sliver + t * 2*Math.PI;
+  const x = cx + r * Math.cos(a);
+  const y = cy + r * Math.sin(a);
+  ctx.beginPath();
+  ctx.arc(x, y, .12 * r, 0, 2*Math.PI);
+  ctx.lineTo(cx, cy);
+  ctx.fillStyle = "#8ADBAC";
   ctx.fill();
   
 //  ctx.beginPath();

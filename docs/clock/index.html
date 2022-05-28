@@ -31,23 +31,28 @@ canvas {
 </style>
 </head>
 <body>
+
   <div class="container">
     <div style="text-align: center; margin-left: 0">
-      <canvas id="g_canvas" width="50" height="50"></canvas>    
+      <canvas id="g_canvas" width="100" height="100"></canvas>
     </div>
     <div style="text-align: center; display: inline-block">
       <span id="g_time_remaining"></span><br>
       <span id="g_season"></span>
     </div>
   </div>
-  <hr>
+
+  <hr><!-- --------------------------------------------------------------------- -->
+
   <table>
     <tr><td>latitude </td><td><input id="g_lat"></input></td></tr>
     <tr><td>longitude</td><td><input id="g_long"></input></td></tr>
   </table>
   <hr>
   <div id="wiki"></div>
-  <hr>
+  
+  <hr><!-- --------------------------------------------------------------------- -->
+
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="./meuusjs.1.0.3.min.js"></script>
   <script src="./clock.js" type="module"></script>
@@ -63,6 +68,7 @@ canvas {
       });
     }); 
   </script>
+
 </body>
 </html>
 
