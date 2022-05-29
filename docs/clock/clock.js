@@ -223,14 +223,26 @@ function draw_clock() {
   ctx.fillStyle = "#999";
   ctx.fill();
 
+  ctx.beginPath();
+  ctx.moveTo(cx + r * Math.cos(sliver), cy + r * Math.sin(sliver));
+  ctx.lineTo(cx, cy);
+  ctx.strokeStyle = "#000";
+  ctx.setLineDash([4, 4]);
+  ctx.stroke();   
+  ctx.setLineDash([]);
+  
   const a = Math.PI - sliver + t * 2*Math.PI;
   const x = cx + r * Math.cos(a);
   const y = cy + r * Math.sin(a);
   ctx.beginPath();
-  ctx.arc(x, y, .12 * r, 0, 2*Math.PI);
+  ctx.arc(x, y, .10 * r, 0, 2*Math.PI);
   ctx.lineTo(cx, cy);
   ctx.fillStyle = "#8ADBAC";
   ctx.fill();
+
+
+
+
   
 //  ctx.beginPath();
 //  ctx.arc(cx, cy, r, 0, 2 * Math.PI);

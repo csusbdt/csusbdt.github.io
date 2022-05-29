@@ -12,19 +12,21 @@ a {
     color: black;    
 }
 canvas {
-  margin-right: 1.0em;
+/*  margin-right: 1.0em; */
 }
 .container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
   justify-content: flex-start;
   align-items: center;
   margin: 0;
 }
+/*
 .container div {
   margin-left: 1.0em;
 }
+*/
 #g_local_time {
   display: none;
 }
@@ -34,7 +36,7 @@ canvas {
 
   <div class="container">
     <div style="text-align: center; margin-left: 0">
-      <canvas id="g_canvas" width="100" height="100"></canvas>
+      <canvas id="g_canvas" width="200" height="200"></canvas>
     </div>
     <div style="text-align: center; display: inline-block">
       <span id="g_time_remaining"></span><br>
