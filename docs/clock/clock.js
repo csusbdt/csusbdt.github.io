@@ -4,12 +4,12 @@ import "./suncalc.js";  // https://github.com/mourner/suncalc
 
 // san berdo 34.1083 -117.2898  
 
-const g_yellow      = "#FBF57D";
-const g_blue        = "#7D83FB";
-const g_green       = "#8ADBAC";
-const g_light_grey  = "#bbb";
-const g_medium_grey = "#999";
-const g_dark_grey   = "#666";
+const yellow      = "#FBF57D";
+const blue        = "#7D83FB";
+const green       = "#8ADBAC";
+const light_grey  = "#bbb";
+const medium_grey = "#999";
+const dark_grey   = "#666";
 
 const milliseconds_per_day  = 24 * 60 * 60 * 1000;
 
@@ -99,7 +99,7 @@ function update() {
   const tomorrow_dawn  = SunCalc.getTimes(tdate, lat, long).dawn.getTime();
 
   //g_local_time.innerHTML = time_string(date);
-
+/*
   if (now < dawn) {
     g_time_remaining.innerHTML = hhmm(dawn - now) + "->light";
   } else if (now < sunrise) {
@@ -110,7 +110,8 @@ function update() {
     g_time_remaining.innerHTML = hhmm(dusk - now) + "->dark";
   } else {
     g_time_remaining.innerHTML = hhmm(tomorrow_dawn - now) + "->light";
-  }  
+  } 
+*/
   draw_clock();
 }
 
@@ -163,7 +164,7 @@ function draw_season() {
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, 2 * Math.PI);
   ctx.lineTo(cx, cy);
-  ctx.fillStyle = g_dark_grey;
+  ctx.fillStyle = dark_grey;
   ctx.fill();
 
   const now          = new Date();
@@ -201,7 +202,7 @@ function draw_season() {
   ctx.beginPath();
   ctx.arc(cx, cy, r, Math.PI / 2, a);
   ctx.lineTo(cx, cy);
-  ctx.fillStyle = g_medium_grey;
+  ctx.fillStyle = medium_grey;
   ctx.fill();
 
   const x = cx + r * Math.cos(a);
@@ -209,9 +210,9 @@ function draw_season() {
   ctx.beginPath();
   ctx.arc(x, y, .10 * r, 0, 2*Math.PI);
   ctx.lineTo(cx, cy);
-  ctx.fillStyle = g_green;
+  ctx.fillStyle = green;
   ctx.fill();
-
+/*
   if (next_j < next_d) {
     if (t - prev_d < next_j - t) {
 	  g_season.innerHTML = "win->" + Math.round((t - prev_d) / 1000 / 60 / 60 / 24);
@@ -225,7 +226,7 @@ function draw_season() {
 	  g_season.innerHTML = Math.round((next_d - t) / 1000 / 60 / 60 / 24) + "->win";
     }
   }
-  
+*/
 }
 
 draw_season();
@@ -245,7 +246,7 @@ function draw_day_circle(p) {
   ctx.fillStyle = "#ff6";
   ctx.fill();
   ctx.beginPath();
-  ctx.moveTo()
+//  ctx.moveTo()
 }
 
 function draw_clock() {
@@ -274,21 +275,21 @@ function draw_clock() {
   const sliver = (p - .5) / 2 * 2*Math.PI;
   const start_angle = Math.PI - sliver;
   const end_angle   = sliver;
-  ctx.arc (cx, cy, r, start_angle, end_angle);
+  ctx.arc(cx, cy, r, start_angle, end_angle);
   ctx.lineTo(cx, cy);
-  ctx.fillStyle = g_yellow;
+  ctx.fillStyle = yellow;
   ctx.fill();
   
   ctx.beginPath();
   ctx.arc(cx, cy, r, end_angle, start_angle);
   ctx.lineTo(cx, cy);
-  ctx.fillStyle = g_dark_grey;
+  ctx.fillStyle = dark_grey;
   ctx.fill();
   
   ctx.beginPath();
   ctx.arc(cx, cy, r, start_angle, Math.PI - sliver + t * 2*Math.PI);
   ctx.lineTo(cx, cy);
-  ctx.fillStyle = g_medium_grey;
+  ctx.fillStyle = medium_grey;
   ctx.fill();
 
 //  ctx.beginPath();
@@ -305,7 +306,7 @@ function draw_clock() {
   ctx.beginPath();
   ctx.arc(x, y, .10 * r, 0, 2*Math.PI);
   ctx.lineTo(cx, cy);
-  ctx.fillStyle = g_green;
+  ctx.fillStyle = green;
   ctx.fill();
 }
 
