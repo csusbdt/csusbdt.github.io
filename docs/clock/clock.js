@@ -4,7 +4,14 @@ import "./suncalc.js";  // https://github.com/mourner/suncalc
 
 // san berdo 34.1083 -117.2898  
 
-const milliseconds_per_day = 24 * 60 * 60 * 1000;
+const yellow      = "#FBF57D";
+const blue        = "#7D83FB";
+const green       = "#8ADBAC";
+const light_grey  = "#bbb";
+const medium_grey = "#999";
+const dark_grey   = "#666";
+
+const milliseconds_per_day  = 24 * 60 * 60 * 1000;
 
 function zero_pad(num, zeros = 2) {
   return num.toString().padStart(zeros, '0');
@@ -92,7 +99,7 @@ function update() {
   const tomorrow_dawn  = SunCalc.getTimes(tdate, lat, long).dawn.getTime();
 
   //g_local_time.innerHTML = time_string(date);
-
+/*
   if (now < dawn) {
     g_time_remaining.innerHTML = hhmm(dawn - now) + "->light";
   } else if (now < sunrise) {
@@ -103,7 +110,8 @@ function update() {
     g_time_remaining.innerHTML = hhmm(dusk - now) + "->dark";
   } else {
     g_time_remaining.innerHTML = hhmm(tomorrow_dawn - now) + "->light";
-  }  
+  } 
+*/
   draw_clock();
 }
 
@@ -124,40 +132,101 @@ g_long.addEventListener('change', _ => {
 
 // season
 
+function get_mar(date) {
+  const jde = A.Solistice.march(date.getFullYear());
+  return A.JulianDay.jdFromJDE(jde).toDate();
+}
+
+function get_jun(year) {
+  const jde = A.Solistice.june(year);
+  return A.JulianDay.jdFromJDE(jde).toDate().getTime();
+}
+
+function get_sep(date) {
+  const jde = A.Solistice.september(date.getFullYear());
+  return A.JulianDay.jdFromJDE(jde).toDate();
+}
+
+function get_dec(year) {
+  console.log(year);
+  const jde = A.Solistice.december(year);
+  return A.JulianDay.jdFromJDE(jde).toDate().getTime();
+}
+
 function draw_season() {
-  const now  = new Date();
-  const march_de     = A.Solistice.march(now.getFullYear());
-  const march_do     = A.JulianDay.jdFromJDE(march_de);
-  const march        = march_do.toDate();
-  const june_de      = A.Solistice.june(now.getFullYear());
-  const june_do      = A.JulianDay.jdFromJDE(june_de);
-  const june         = june_do.toDate();
-  const september_de = A.Solistice.september(now.getFullYear());
-  const september_do = A.JulianDay.jdFromJDE(september_de);
-  const september    = september_do.toDate();
-  const december_de  = A.Solistice.december(now.getFullYear());
-  const december_do  = A.JulianDay.jdFromJDE(december_de);
-  const december     = december_do.toDate();
-  const march2_de    = A.Solistice.march(now.getFullYear() + 1);
-  const march2_do    = A.JulianDay.jdFromJDE(march2_de);
-  const march2       = march2_do.toDate();
-  const n  = now.getTime();
-  const m  = march.getTime();
-  const j  = june.getTime();
-  const s  = september.getTime();
-  const d  = december.getTime();
-  const m2 = march2.getTime();
-  if (n < m) {
-	  g_season.innerHTML = Math.round((m  - n) / 1000 / 60 / 60 / 24) + "->spr";
-  } else if (n < j) {
-	  g_season.innerHTML = Math.round((j  - n) / 1000 / 60 / 60 / 24) + "->sum";
-  } else if (n < s) {
-	  g_season.innerHTML = Math.round((s  - n) / 1000 / 60 / 60 / 24) + "->aut";
-  } else if (n < d) {
-	  g_season.innerHTML = Math.round((d  - n) / 1000 / 60 / 60 / 24) + "->win";
+  const ctx = g_canvas_season.getContext('2d');
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.beginPath();
+  const cx = ctx.canvas.width  / 2;
+  const cy = ctx.canvas.height / 2;
+  const r  = ctx.canvas.width  / 2 * .83;
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+  ctx.lineTo(cx, cy);
+  ctx.fillStyle = dark_grey;
+  ctx.fill();
+
+  const now          = new Date();
+  const t            = now.getTime();
+  const current_year = now.getFullYear();
+  const prev_year    = current_year - 1;
+  const next_year    = current_year + 1;
+
+  let prev_d = null;
+  let next_d = null;
+  const d = get_dec(current_year);
+  if (t < d) {
+    next_d = d;
+    prev_d = get_dec(prev_year);
   } else {
-	  g_season.innerHTML = Math.round((m2 - n) / 1000 / 60 / 60 / 24) + "->spr";
+    next_d = get_dec(next_year);
+    prev_d = d;
   }
+  
+  let prev_j = null;
+  let next_j = null;
+  const j = get_jun(current_year);
+  if (t < j) {
+    next_j = j;
+    prev_j = get_jun(prev_year);
+  } else {
+    next_j = get_jun(next_year);
+    prev_j = j;
+  }
+
+  const p = (t - prev_d) / (next_d - prev_d); // percent of year completed
+
+  const a = p * 2 * Math.PI + Math.PI / 2;
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, Math.PI / 2, a);
+  ctx.lineTo(cx, cy);
+  ctx.fillStyle = medium_grey;
+  ctx.fill();
+
+  const x = cx + r * Math.cos(a);
+  const y = cy + r * Math.sin(a);
+  ctx.beginPath();
+  ctx.arc(x, y, .10 * r, 0, 2*Math.PI);
+  ctx.lineTo(cx, cy);
+  ctx.fillStyle = green;
+  ctx.fill();
+/*
+  if (next_j < next_d) {
+    if (t - prev_d < next_j - t) {
+	  g_season.innerHTML = "win->" + Math.round((t - prev_d) / 1000 / 60 / 60 / 24);
+    } else {
+	  g_season.innerHTML = Math.round((next_j - t) / 1000 / 60 / 60 / 24) + "->sum";
+    }
+  } else {
+    if (t - prev_j < next_d - t) {
+	  g_season.innerHTML = "sum->" + Math.round((t - prev_j) / 1000 / 60 / 60 / 24);
+    } else {
+	  g_season.innerHTML = Math.round((next_d - t) / 1000 / 60 / 60 / 24) + "->win";
+    }
+  }
+*/
 }
 
 draw_season();
@@ -177,7 +246,7 @@ function draw_day_circle(p) {
   ctx.fillStyle = "#ff6";
   ctx.fill();
   ctx.beginPath();
-  ctx.moveTo()
+//  ctx.moveTo()
 }
 
 function draw_clock() {
@@ -206,30 +275,30 @@ function draw_clock() {
   const sliver = (p - .5) / 2 * 2*Math.PI;
   const start_angle = Math.PI - sliver;
   const end_angle   = sliver;
-  ctx.arc (cx, cy, r, start_angle, end_angle);
+  ctx.arc(cx, cy, r, start_angle, end_angle);
   ctx.lineTo(cx, cy);
-  ctx.fillStyle = "#FAF25C";
+  ctx.fillStyle = yellow;
   ctx.fill();
   
   ctx.beginPath();
   ctx.arc(cx, cy, r, end_angle, start_angle);
   ctx.lineTo(cx, cy);
-  ctx.fillStyle = "#333";
+  ctx.fillStyle = dark_grey;
   ctx.fill();
   
   ctx.beginPath();
   ctx.arc(cx, cy, r, start_angle, Math.PI - sliver + t * 2*Math.PI);
   ctx.lineTo(cx, cy);
-  ctx.fillStyle = "#999";
+  ctx.fillStyle = medium_grey;
   ctx.fill();
 
-  ctx.beginPath();
-  ctx.moveTo(cx + r * Math.cos(sliver), cy + r * Math.sin(sliver));
-  ctx.lineTo(cx, cy);
-  ctx.strokeStyle = "#000";
-  ctx.setLineDash([4, 4]);
-  ctx.stroke();   
-  ctx.setLineDash([]);
+//  ctx.beginPath();
+//  ctx.moveTo(cx + r * Math.cos(sliver), cy + r * Math.sin(sliver));
+//  ctx.lineTo(cx, cy);
+//  ctx.strokeStyle = "#000";
+//  ctx.setLineDash([4, 4]);
+//  ctx.stroke();   
+//  ctx.setLineDash([]);
   
   const a = Math.PI - sliver + t * 2*Math.PI;
   const x = cx + r * Math.cos(a);
@@ -237,22 +306,7 @@ function draw_clock() {
   ctx.beginPath();
   ctx.arc(x, y, .10 * r, 0, 2*Math.PI);
   ctx.lineTo(cx, cy);
-  ctx.fillStyle = "#8ADBAC";
+  ctx.fillStyle = green;
   ctx.fill();
-
-
-
-
-  
-//  ctx.beginPath();
-//  ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-//  ctx.strokeStyle = "#000";
-//  ctx.stroke(); 
-
-//  const a = Math.PI - sliver + t * 2*Math.PI;
-//  ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
-//  ctx.lineTo(cx, cy);
-//  ctx.strokeStyle = "#000";
-//  ctx.stroke(); 
 }
 
