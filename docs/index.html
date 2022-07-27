@@ -16,6 +16,15 @@ a {
     color: white;
     font-size: 2em;
 }
+#g_footer {
+  position: fixed;
+  left: 0;
+  bottom: 2em;
+  width: 100%;
+  color: white;
+  text-align: center;
+  font-size: 150%;
+}
 </style>
 </head>
 <body onclick="on_click()">
@@ -27,6 +36,7 @@ a {
             <a id="g_clock" href="clock/index.html">Clock</a><br>
         </div>
     </div>
+    <div id="g_footer" onclick="event.stopPropagation();">csusbdt@gmail.com</div>
     
     <script type="module">
         window.on_click = e => {
@@ -49,6 +59,7 @@ a {
             } else {
                 g_clock.setAttribute('target', '_blank');
             }
+            g_footer.blur();
         });
     </script>
 </body>
