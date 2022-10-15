@@ -29,10 +29,8 @@ a {
 </head>
 <body onclick="on_click()">
     <div id="g_audio_div" style="display: none">
-        <div style="margin-bottom: 1em">Happy Birthday and Farewell</div>
         <audio id="g_audio" controls><source src="happy_birthday.mp3" type="audio/mpeg"></audio>
         <div style="margin-top: 3em">
-            <a id="g_blog" href="blog/index.html">Blog</a><br>
             <a id="g_clock" href="clock/index.html">Clock</a><br>
         </div>
     </div>
@@ -41,19 +39,11 @@ a {
     <script type="module">
         window.on_click = e => {
             if (g_audio_div.style.display === "none") {
-                g_audio_div.style = "display: flex; flex-direction: column; justify-content: center; align-items: center;";
+                g_audio_div.style = "display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top: 1em";
             } else {
-                g_audio_div.style = "display: none;";               
+                g_audio_div.style = "display: none";               
             }
         };
-        on_click(null);
-        g_blog.addEventListener('click', e => {
-            if (g_audio.paused) {
-                g_blog.removeAttribute('target');                
-            } else {
-                g_blog.setAttribute('target', '_blank');
-            }
-        });
         g_clock.addEventListener('click', e => {
             if (g_audio.paused) {
                 g_clock.removeAttribute('target');                
