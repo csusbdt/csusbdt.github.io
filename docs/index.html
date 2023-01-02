@@ -3,76 +3,29 @@
 <title>Home</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <style>
-body {
-    background-image: url("palace_of_electricity.jpg");
-    background-color: #cccccc;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    margin: 0;
-    padding: 10;
+div {
+    padding: 2vmax;
+    font-size: 3vmax;
 }
-a {
-    color: white;
-    font-size: 2em;
-}
-#g_footer {
-  position: fixed;
-  left: 0;
-  bottom: 2em;
-  width: 100%;
-  color: white;
-  text-align: center;
-  font-size: 150%;
+.parent {
+    height: 100%;
+    flex-direction: column;
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    align-content: center;
 }
 </style>
 </head>
-<body onclick="on_click()">
-    <div id="g_audio_div" style="display: none">
-        <audio id="g_audio" controls><source src="happy_birthday.mp3" type="audio/mpeg"></audio>
-        <div style="margin-top: 3em">
-            <!--a id="g_clock" href="clock/index.html">Clock</a><br-->
-            <div id="wiki"></div>
-        </div>
-    </div>
-    <div id="g_footer" onclick="event.stopPropagation();">csusbdt@gmail.com</div>
+<body>
 
-   <!--script src="./wiki.js" type="module"></script-->
+<div class="parent">
   
-    <script type="module">
-        window.on_click = e => {
-            if (g_audio_div.style.display === "none") {
-                g_audio_div.style = "display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top: 1em";
-            } else {
-                g_audio_div.style = "display: none";               
-            }
-        };
-      /*
-        g_clock.addEventListener('click', e => {
-            if (g_audio.paused) {
-                g_clock.removeAttribute('target');                
-            } else {
-                g_clock.setAttribute('target', '_blank');
-            }
-            g_footer.blur();
-        });
-      */
-    </script>
+<div>csusbdt@gmail.com</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<div><a href="https://github.com/csusbdt/csusbdt.github.io/wiki/Links">Wiki</a></div>
 
-    <script type="module">
-        //console.log(window.location.href);
-        //let s = window.location.href.lastIndexOf("/");
-        //let e = window.location.href.lastIndexOf(".html");
-        //let n = window.location.href.substr(s + 1, e - s - 1);
-        fetch("https://raw.githubusercontent.com/wiki/csusbdt/csusbdt.github.io/Home.md", {cache: "no-store"})
-        .then(response => {
-          response.text().then(text => {
-            document.getElementById('wiki').innerHTML = marked.parse(text);
-          });
-        }); 
-  </script>
+</div>
   
 </body>
 </html>
