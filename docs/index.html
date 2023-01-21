@@ -3,10 +3,6 @@
 <title>Home</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <style>
-div {
-    padding: 2vmax;
-    font-size: 3vmax;
-}
 .parent {
     height: 100%;
     flex-direction: column;
@@ -15,18 +11,47 @@ div {
     justify-content: center;
     align-content: center;
 }
+.child {
+    padding: 3vmax;
+    font-size: 5vmax;
+}
+label {
+    font-size: 2.5vmax;  
+}
 </style>
 </head>
 <body>
 
 <div class="parent">
   
-<div>David Turner</div>
+<div class="child">David Turner</div>
   
-<div>csusbdt@gmail.com</div>
+<div class="child"><a href="https://github.com/csusbdt/csusbdt.github.io/wiki/">Wiki</a></div>
 
-<div><a href="https://github.com/csusbdt/csusbdt.github.io/wiki/">Wiki</a></div>
-
+<div class="child">
+<form action="mailto:csusbdt@gmail.com" method="get" enctype="text/plain">
+  <div>
+    <label for="name">Name:
+      <input type="text" name="name" id="name" />
+    </label>
+  </div>
+  <div>
+    <label for="email">Email:
+      <input type="text" name="email" id="email" />
+    </label>
+  </div>
+  <div>
+    <label for="message">Message:</label>
+    <br />
+    <textarea name="message" rows="12" cols="35"></textarea>
+  </div>
+  <div>
+    <input type="submit" name="submit" value="Send" />
+    <input type="reset" name="reset" value="Clear Form" />
+  </div>
+</form>
+</div>
+  
 </div>
   
 </body>
