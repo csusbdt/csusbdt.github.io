@@ -1,0 +1,30 @@
+body {
+	background-color: #DDDDDD;
+}
+
+#content {
+	width: 36em;
+}
+
+pre {
+	color: #0000ff;
+	padding-left: 1em;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table caption {
+	font-weight: bold;
+}
+
+thead tr td {
+	text-align: center;
+	font-style: italic;
+}
+
+td {
+	border: 1px #000 solid;
+	padding: .4em;
+}

@@ -1,0 +1,84 @@
+<p>
+Solfeggio Frequencies
+</p>
+
+<button id='start_396'>start 396</button> o <button id='stop_396'>stop 396</button><br>
+<button id='start_417'>start 417</button> o <button id='stop_417' style="background-color: white">stop 417</button><br>
+<button id='start_528'>start 528</button> o <button id='stop_528' style="background-color: white">stop 528</button><br>
+<button id='start_639'>start 639</button> o <button id='stop_639' style="background-color: white">stop 639</button><br>
+<button id='start_741'>start 741</button> o <button id='stop_741' style="background-color: white">stop 741</button><br>
+<button id='start_852'>start 852</button> o <button id='stop_852' style="background-color: white">stop 852</button><br>
+
+<script type = 'module'>
+let audio = null;
+let g_396 = null;
+let g_417 = null;
+let g_528 = null;
+let g_639 = null;
+let g_741 = null;
+let g_852 = null;
+
+function init() {
+	if (audio !== null) return;
+	audio = new (window.AudioContext || window.webkitAudioContext)();
+
+	g_396 = audio.createGain();
+	g_417 = audio.createGain();
+	g_528 = audio.createGain();
+	g_639 = audio.createGain();
+	g_741 = audio.createGain();
+	g_852 = audio.createGain();
+
+	g_396.gain.value = 0;
+	g_417.gain.value = 0;
+	g_528.gain.value = 0;
+	g_639.gain.value = 0;
+	g_741.gain.value = 0;
+	g_852.gain.value = 0;
+
+	g_396.connect(audio.destination);
+	g_417.connect(audio.destination);
+	g_528.connect(audio.destination);
+	g_639.connect(audio.destination);
+	g_741.connect(audio.destination);
+	g_852.connect(audio.destination);
+
+	let o = null;
+	o = audio.createOscillator(); o.frequency.value = 396; o.connect(g_396); o.start();
+	o = audio.createOscillator(); o.frequency.value = 417; o.connect(g_417); o.start();
+	o = audio.createOscillator(); o.frequency.value = 528; o.connect(g_528); o.start();
+	o = audio.createOscillator(); o.frequency.value = 639; o.connect(g_639); o.start();
+	o = audio.createOscillator(); o.frequency.value = 741; o.connect(g_741); o.start();
+	o = audio.createOscillator(); o.frequency.value = 852; o.connect(g_852); o.start();
+}
+
+function on(e) {
+	e.style.backgroundColor = 'lightgreen';
+}
+
+function off(e) {
+	e.style.backgroundColor = 'white';
+}
+
+on(stop_396);
+on(stop_417);
+on(stop_528);
+on(stop_639);
+on(stop_741);
+on(stop_852);
+
+start_396.addEventListener('click', () => { init(); g_396.gain.setTargetAtTime(.1, audio.currentTime, .1); on(start_396); off(stop_396); });
+start_417.addEventListener('click', () => { init(); g_417.gain.setTargetAtTime(.1, audio.currentTime, .1); on(start_417); off(stop_417); });
+start_528.addEventListener('click', () => { init(); g_528.gain.setTargetAtTime(.1, audio.currentTime, .1); on(start_528); off(stop_528); });
+start_639.addEventListener('click', () => { init(); g_639.gain.setTargetAtTime(.1, audio.currentTime, .1); on(start_639); off(stop_639); });
+start_741.addEventListener('click', () => { init(); g_741.gain.setTargetAtTime(.1, audio.currentTime, .1); on(start_741); off(stop_741); });
+start_852.addEventListener('click', () => { init(); g_852.gain.setTargetAtTime(.1, audio.currentTime, .1); on(start_852); off(stop_852); });
+
+stop_396.addEventListener('click', () => { init(); g_396.gain.setTargetAtTime(0, audio.currentTime, .1); off(start_396); on(stop_396); });
+stop_417.addEventListener('click', () => { init(); g_417.gain.setTargetAtTime(0, audio.currentTime, .1); off(start_417); on(stop_417); });
+stop_528.addEventListener('click', () => { init(); g_528.gain.setTargetAtTime(0, audio.currentTime, .1); off(start_528); on(stop_528); });
+stop_639.addEventListener('click', () => { init(); g_639.gain.setTargetAtTime(0, audio.currentTime, .1); off(start_639); on(stop_639); });
+stop_741.addEventListener('click', () => { init(); g_741.gain.setTargetAtTime(0, audio.currentTime, .1); off(start_741); on(stop_741); });
+stop_852.addEventListener('click', () => { init(); g_852.gain.setTargetAtTime(0, audio.currentTime, .1); off(start_852); on(stop_852); });
+
+</script>

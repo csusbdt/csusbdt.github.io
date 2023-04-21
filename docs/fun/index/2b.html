@@ -1,0 +1,316 @@
+<style>
+<style>
+* {
+	margin: 0;
+	padding: 0;
+}
+body, html {
+	height: 100%;
+	background-color: #000;
+	overflow: hidden;
+}
+#canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+</style>
+
+<canvas id='canvas'></canvas>
+
+<script>
+	window.addEventListener('load', function() {
+		const canvas = document.querySelector('#canvas');
+
+		const phi = 1.6180339887;
+
+		let a1 = null;
+		let a2 = null;
+		let a3 = null;
+		let a4 = null;
+		let b1 = null;
+		let b2 = null;
+		let b3 = null;
+		let b4 = null;
+		let c1 = null;
+		let c2 = null;
+		let c3 = null;
+		let c4 = null;
+		let d1 = null;
+		let d2 = null;
+		let d3 = null;
+		let d4 = null;
+
+		let previous_time = null;
+		let elapsed_time = 0;
+		var ctx = canvas.getContext('2d');
+		let audio_context = null;
+
+		const freq = 1 / 60 / 11;
+
+		const p1 = 60;
+		const p2 = p1 * phi;
+		const p3 = p2 * phi;
+
+		function random_color() {
+			let red   = (elapsed_time - p1 * Math.trunc(elapsed_time / p1)) / p1;
+			let green = (elapsed_time - p2 * Math.trunc(elapsed_time / p2)) / p2;
+			let blue  = (elapsed_time - p3 * Math.trunc(elapsed_time / p3)) / p3;
+			
+			if (red > .5) red = 1 - red;
+			red *= 2;
+
+			if (green > .5) green = 1 - green;
+			green *= 2;
+
+			if (blue > .5) blue = 1 - blue;
+			blue *= 2;
+
+			const s = "#" 
+			+ Math.floor(red * 256).toString(16).padStart(2, '0')
+			+ Math.floor(green * 256).toString(16).padStart(2, '0')
+			+ Math.floor(blue * 256).toString(16).padStart(2, '0');
+
+			return s;
+
+//			let u = elapsed_time % period;
+
+			// let u = elapsed_time - Math.floor(elapsed_time / period) * period;
+
+			// if (u > .5) u = 1 - u;
+			// u *= 2;
+
+//			const u = (Math.sin(elapsed_time * 2 * Math.PI * freq) + 1) / 2;
+//			const c = Math.floor(Math.pow(u, 3) * 0xFFFFFF);
+//			const c = Math.floor(u * 0xFFFFFF);
+//			return "#" + c.toString(16).padStart(6, '0');
+		}
+
+		function random_coord() {
+			const r = .5 * Math.pow(Math.random(), 2) * Math.hypot(canvas.width, canvas.height);
+			const a = Math.random() * 2 * Math.PI;
+			const x = .5 * canvas.width + r * Math.cos(a);
+			const y = .5 * canvas.height + r * Math.sin(a);
+			return [Math.floor(x), Math.floor(y)];
+		}
+
+		function adjust_canvas() {
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+		}
+
+		window.addEventListener('resize', adjust_canvas, true);
+		adjust_canvas();
+
+		function animation_loop() {
+			if (audio_context.state === 'running') {
+				const current_time = new Date().getTime() / 1000;
+				let dt = current_time - previous_time;
+				previous_time = current_time;
+				elapsed_time += dt;
+				const num = Math.floor(canvas.width / 45);
+				for (let i = 0; i < num; ++i) {
+					ctx.beginPath();
+					ctx.fillStyle = random_color();
+					const coord = random_coord();
+					ctx.fillRect(coord[0], coord[1], 1, 1);
+					ctx.fill();
+				}
+			}
+			else {
+				previous_time = new Date().getTime() / 1000;
+			}
+			requestAnimationFrame(animation_loop);
+		}
+
+		function start_audio() {
+			const w = audio_context.createGain();
+			w.gain.value = 0;
+			w.gain.setTargetAtTime(.1, audio_context.currentTime, 1);
+			w.connect(audio_context.destination);
+
+			const w1 = audio_context.createGain();
+			const w2 = audio_context.createGain();
+			const w3 = audio_context.createGain();
+			const w4 = audio_context.createGain();
+
+			w1.gain.value = 1;
+			w2.gain.value = .8;
+			w3.gain.value = .4;
+			w4.gain.value = .1;
+
+			w1.connect(w);
+			w2.connect(w);
+			w3.connect(w);
+			w4.connect(w);
+
+			a1 = audio_context.createOscillator();
+			a2 = audio_context.createOscillator();
+			a3 = audio_context.createOscillator();
+			a4 = audio_context.createOscillator();
+			a1.frequency.value = 80;
+			a2.frequency.value = a1.frequency.value * phi;
+			a3.frequency.value = a2.frequency.value * phi;
+			a4.frequency.value = a3.frequency.value * phi;
+
+			b1 = audio_context.createOscillator();
+			b2 = audio_context.createOscillator();
+			b3 = audio_context.createOscillator();
+			b4 = audio_context.createOscillator();
+			b1.frequency.value = 3;
+			b2.frequency.value = 4;
+			b3.frequency.value = 5;
+			b4.frequency.value = 6;
+
+			c1 = audio_context.createOscillator();
+			c2 = audio_context.createOscillator();
+			c3 = audio_context.createOscillator();
+			c4 = audio_context.createOscillator();
+			c4.frequency.value = 1 / 10;
+			c3.frequency.value = c4.frequency.value / phi;
+			c2.frequency.value = c3.frequency.value / phi;
+			c1.frequency.value = c2.frequency.value / phi;
+
+			d1 = audio_context.createOscillator();
+			d2 = audio_context.createOscillator();
+			d3 = audio_context.createOscillator();
+			d4 = audio_context.createOscillator();
+			d4.frequency.value = 1 / 60 / 11;
+			d3.frequency.value = d4.frequency.value / phi;
+			d2.frequency.value = d3.frequency.value / phi;
+			d1.frequency.value = d2.frequency.value / phi;
+
+			const ab1 = audio_context.createGain();
+			const ab2 = audio_context.createGain();
+			const ab3 = audio_context.createGain();
+			const ab4 = audio_context.createGain();
+
+			const abc1 = audio_context.createGain();
+			const abc2 = audio_context.createGain();
+			const abc3 = audio_context.createGain();
+			const abc4 = audio_context.createGain();
+
+			const abcd1 = audio_context.createGain();
+			const abcd2 = audio_context.createGain();
+			const abcd3 = audio_context.createGain();
+			const abcd4 = audio_context.createGain();
+
+			a1.connect(ab1);
+			a2.connect(ab2);
+			a3.connect(ab3);
+			a4.connect(ab4);
+
+			b1.connect(ab1.gain);
+			b2.connect(ab2.gain);
+			b3.connect(ab3.gain);
+			b4.connect(ab4.gain);
+
+			ab1.connect(abc1);
+			ab2.connect(abc2);
+			ab3.connect(abc3);
+			ab4.connect(abc4);
+
+			c1.connect(abc1.gain);
+			c2.connect(abc2.gain);
+			c3.connect(abc3.gain);
+			c4.connect(abc4.gain);
+
+			abc1.connect(abcd1);
+			abc2.connect(abcd2);
+			abc3.connect(abcd3);
+			abc4.connect(abcd4);
+
+			d1.connect(abcd1.gain);
+			d2.connect(abcd2.gain);
+			d3.connect(abcd3.gain);
+			d4.connect(abcd4.gain);
+
+			abcd1.connect(w1);
+			abcd2.connect(w2);
+			abcd3.connect(w3);
+			abcd4.connect(w4);
+
+			setTimeout(() => {
+				a1.start();
+				b1.start();
+				c1.start();
+				d1.start();
+			}, 0);
+
+			setTimeout(() => {
+				a2.start();
+				b2.start();
+				c2.start();
+				d2.start();
+			}, 100);
+
+			setTimeout(() => {
+				a3.start();
+				b3.start();
+				c3.start();
+				d3.start();
+			}, 250);
+
+			setTimeout(() => {
+				a4.start();
+				b4.start();
+				c4.start();
+				d4.start();
+			}, 660);
+		}
+
+		function start() {
+			function toggle() {
+				if (audio_context.state === 'running') {
+					audio_context.suspend();
+				} else {
+					audio_context.resume();
+				}
+			}
+			audio_context = new (window.AudioContext || window.webkitAudioContext)();
+			function resume() {
+				setTimeout(() => {
+					audio_context.resume();
+					if (audio_context.state === 'running') {
+						start_audio();
+						previous_time = new Date().getTime() / 1000;
+						requestAnimationFrame(animation_loop);
+						const options = { capture: true, passive: false, once: false };
+						document.body.addEventListener('mousedown', e => {
+							toggle();
+							e.preventDefault();
+							e.stopPropagation();
+							document.body.removeEventListener('touchstart', options);
+						}, options);
+						document.body.addEventListener('touchstart', e => {
+							toggle();
+							e.preventDefault();
+							e.stopPropagation();
+							document.body.removeEventListener('mousedown', options);
+						}, options);
+					} else {
+						return resume();
+					}
+				}, 10);
+			}
+			resume();
+		}
+
+		const options = { capture: true, passive: false, once: true };
+
+		document.body.addEventListener('mousedown', e => {
+			start();
+			e.preventDefault();
+			e.stopPropagation();
+			document.body.removeEventListener('touchstart', options);
+		}, options);
+
+		document.body.addEventListener('touchstart', e => {
+			start();
+			e.preventDefault();
+			e.stopPropagation();
+			document.body.removeEventListener('mousedown', options);
+		}, options);
+
+	});
+</script>

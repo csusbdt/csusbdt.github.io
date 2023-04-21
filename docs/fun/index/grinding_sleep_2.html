@@ -1,0 +1,244 @@
+<html>
+<head>
+<title>grinding sleep</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<style>
+body {
+	padding: 0;
+	margin: 0;
+	font-family: sans-serif;
+	font-size: x-large;
+}
+.container {
+	display: none;
+	flex-direction: column;
+	justify-content: center;
+	height: 100vh;
+	width: 100vw;
+}
+.button {
+	user-select: none;
+	display: inline-block;
+	width: 50vmin;
+	padding: 3vmin;
+	font-size: 7vmin;
+	font-family: sans-serif;
+	background-color: lightgreen;
+	margin-bottom: 2vw;
+	margin-top: 2vw;
+	margin-left: 25vw;
+	margin-right: 25vw;
+	text-align: center;
+}
+#g_start_container {
+	display: flex;
+}
+#g_black_container {
+	background-color:black;
+}
+#g_about_container div {
+	padding: 10vmin;
+}
+</style>
+</head>
+<body>
+	<div class='container' id='g_start_container'>
+		<div class='button' id='g_start_start_button'>start</div>
+		<div class='button' id='g_start_back_button'>back</div>
+	</div>
+	<div class='container' id='g_playing_container'>
+		<div class='button' id='g_playing_pause_button'>pause</div>
+		<div class='button' id='g_playing_black_button'>go black</div>
+		<div class='button' id='g_playing_about_button'>about</div>
+		<div class='button' id='g_playing_exit_button'>exit</div>
+	</div>
+	<div class='container' id='g_paused_container'>
+		<div class='button' id='g_paused_resume_button'>resume</div>
+	</div>
+	<div class='container' id='g_black_container'>
+	</div>
+	<div class='container' id='g_about_container'>
+		<div>
+			Use headphones or sound system with a woofer.
+		</div>
+	</div>
+<script type="module">
+const phi = 1.6180339887;
+let audio = null;
+let w     = null;
+
+let o1 = null;
+let o2 = null;
+let o3 = null;
+let o4 = null;
+
+let a1 = null;
+let a2 = null;
+let a3 = null;
+let a4 = null;
+
+let p1 = null;
+let p2 = null;
+let p3 = null;
+let p4 = null;
+
+let f = 80;
+let a = 3;
+let p = 10;
+
+const init = () => {
+	audio = new (window.AudioContext || window.webkitAudioContext)();
+	w = audio.createGain();
+	w.gain.value = 0;
+	w.connect(audio.destination);
+
+	const w1 = audio.createGain();
+	const w2 = audio.createGain();
+	const w3 = audio.createGain();
+	const w4 = audio.createGain();
+
+	w1.gain.value = 1;
+	w2.gain.value = .8;
+	w3.gain.value = .4;
+	w4.gain.value = .1;
+
+	w1.connect(w);
+	w2.connect(w);
+	w3.connect(w);
+	w4.connect(w);
+
+	o1 = audio.createOscillator();
+	o2 = audio.createOscillator();
+	o3 = audio.createOscillator();
+	o4 = audio.createOscillator();
+
+	o1.frequency.value = f;
+	o2.frequency.value = o1.frequency.value * phi;
+	o3.frequency.value = o2.frequency.value * phi;
+	o4.frequency.value = o3.frequency.value * phi;
+
+	a1 = audio.createOscillator();
+	a2 = audio.createOscillator();
+	a3 = audio.createOscillator();
+	a4 = audio.createOscillator();
+
+	a1.frequency.value = a;
+	a2.frequency.value = a1.frequency.value + 1;
+	a3.frequency.value = a2.frequency.value + 1;
+	a4.frequency.value = a3.frequency.value + 1;
+
+	p1 = audio.createOscillator();
+	p2 = audio.createOscillator();
+	p3 = audio.createOscillator();
+	p4 = audio.createOscillator();
+
+	p4.frequency.value = 1 / p;
+	p3.frequency.value = p4.frequency.value / phi;
+	p2.frequency.value = p3.frequency.value / phi;
+	p1.frequency.value = p2.frequency.value / phi;
+
+	const oa1 = audio.createGain();
+	const oa2 = audio.createGain();
+	const oa3 = audio.createGain();
+	const oa4 = audio.createGain();
+
+	const oap1 = audio.createGain();
+	const oap2 = audio.createGain();
+	const oap3 = audio.createGain();
+	const oap4 = audio.createGain();
+
+	o1.connect(oa1);
+	o2.connect(oa2);
+	o3.connect(oa3);
+	o4.connect(oa4);
+
+	a1.connect(oa1.gain);
+	a2.connect(oa2.gain);
+	a3.connect(oa3.gain);
+	a4.connect(oa4.gain);
+
+	oa1.connect(oap1);
+	oa2.connect(oap2);
+	oa3.connect(oap3);
+	oa4.connect(oap4);
+
+	p1.connect(oap1.gain);
+	p2.connect(oap2.gain);
+	p3.connect(oap3.gain);
+	p4.connect(oap4.gain);
+
+	oap1.connect(w1);
+	oap2.connect(w2);
+	oap3.connect(w3);
+	oap4.connect(w4);
+
+	o1.start();
+	o2.start();
+	o3.start();
+	o4.start();
+	a1.start();
+	a2.start();
+	a3.start();
+	a4.start();
+	p1.start();
+	p2.start();
+	p3.start();
+	p4.start();
+
+	w.gain.setTargetAtTime(1, audio.currentTime, .1);
+};
+
+let timeout = null;
+
+g_start_start_button.addEventListener('click', _ => {
+	init();
+	g_start_container.style.display = 'none'; 
+	g_playing_container.style.display = 'flex';
+});
+g_start_back_button.addEventListener('click', _ => { 
+	location.href = './'; 
+});
+g_playing_pause_button.addEventListener('click', _ => { 
+	if (timeout) return;
+	w.gain.setTargetAtTime(0, audio.currentTime, .1);
+	timeout = setTimeout(() => {
+		audio.suspend();
+		g_playing_container.style.display = 'none'; 
+		g_paused_container.style.display = 'flex'; 
+		timeout = null;
+	}, 300);
+});
+g_playing_black_button.addEventListener('click', _ => { 
+	g_playing_container.style.display = 'none'; 
+	g_black_container.style.display = 'flex'; 
+});
+g_playing_about_button.addEventListener('click', _ => { 
+	g_playing_container.style.display = 'none'; 
+	g_about_container.style.display = 'flex'; 
+});
+g_playing_exit_button.addEventListener('click', _ => { 
+	location.href = './'; 
+});
+g_paused_resume_button.addEventListener('click', _ => { 
+	if (timeout) return;
+	w.gain.setTargetAtTime(1, audio.currentTime, .1);
+	timeout = setTimeout(() => {
+		audio.resume();
+		g_paused_container.style.display = 'none'; 
+		g_playing_container.style.display = 'flex'; 
+		timeout = null;
+	}, 300);
+});
+g_black_container.addEventListener('click', _ => { 
+	g_black_container.style.display = 'none'; 
+	g_playing_container.style.display = 'flex'; 
+});
+g_about_container.addEventListener('click', _ => { 
+	g_about_container.style.display = 'none'; 
+	g_playing_container.style.display = 'flex'; 
+});
+
+
+</script>
+</body>
+</html>

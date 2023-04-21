@@ -1,0 +1,351 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<style>
+body {
+	padding: 0;
+	margin: 0;
+	font-family: sans-serif;
+	font-size: x-large;
+}
+.container {
+	display: none;
+	flex-direction: column;
+	justify-content: center;
+	height: 100vh;
+	width: 100vw;
+}
+.button {
+	user-select: none;
+	display: inline-block;
+	width: 50vmin;
+	padding: 3vmin;
+	font-size: 7vmin;
+	font-family: sans-serif;
+	background-color: lightgreen;
+	margin-bottom: 2vw;
+	margin-top: 2vw;
+	margin-left: 25vw;
+	margin-right: 25vw;
+	text-align: center;
+}
+#g_start_container {
+	display: flex;
+}
+#g_black_container {
+	background-color:black;
+}
+#g_about_container div {
+	padding: 10vmin;
+}
+</style>
+</head>
+<body>
+	<div class='container' id='g_start_container'>
+		<div class='button' id='g_start_start_button'>start</div>
+		<div class='button' id='g_start_back_button'>back</div>
+	</div>
+	<div class='container' id='g_playing_container'>
+		<div class='button' id='g_playing_pause_button'>pause</div>
+		<div class='button' id='g_playing_black_button'>go black</div>
+		<div class='button' id='g_playing_about_button'>about</div>
+		<div class='button' id='g_playing_exit_button'>exit</div>
+	</div>
+	<div class='container' id='g_paused_container'>
+		<div class='button' id='g_paused_resume_button'>resume</div>
+	</div>
+	<div class='container' id='g_black_container'>
+	</div>
+	<div class='container' id='g_about_container'>
+		<div>
+			This sound composition uses binaural beats; <br>
+			<b>use only with headphones</b>.
+			<br><br>
+			Facilitates sleep, meditation and out-of-body states.
+		</div>
+	</div>
+<script type="module">
+let seconds = 0;
+let seconds_interval = null;
+
+const timer_on = () => {
+	return;
+	if (seconds_interval !== null) throw new Error();
+	seconds_interval = setInterval(() => console.log(++seconds), 1000);
+};
+
+const timer_off = () => {
+	return;
+	if (seconds_interval === null) throw new Error();
+	clearInterval(seconds_interval);
+	seconds_interval = null;
+};
+
+async function delay(t) {
+	return new Promise(resolve => {
+		setTimeout(() => resolve(), t * 1000);
+	});
+}
+
+async function once(start_delay, f) {
+	return new Promise(resolve => {
+		setTimeout(() => { f(); resolve(); }, start_delay * 1000);
+	});
+}
+
+function loop(start_delay, period, f) {
+	once(start_delay, () => setInterval(f, period * 1000));
+}
+
+// function path(g, ...vt) {
+// 	let p = 0;
+// 	for (let i = 0; i < vt.length; ++i) {
+// 		p += vt[i][1];
+// 	}
+// 	let start_delay = 0;
+// 	for (let i = 0; i < vt.length; ++i) {
+// 		const v = vt[i][0];
+// 		const t = vt[i][1];
+// 	???	loop(start_delay, t, v);
+// 		g.setTargetAtTime(v, audio.currentTime, t);
+// 	}
+// }
+
+const phi = 1.6180339887;
+let audio = null;
+let root_gain  = null;
+
+const frequency = (f) => {
+	const o = audio.createOscillator();
+	o.frequency.value = f;
+	o.start();
+	return o;
+};
+
+const period = (p) => {
+	return frequency(1 / p);
+};
+
+const binaural = (f1, f2) => {
+	const n = audio.createGain();
+	const left  = frequency(f1);
+	const right = frequency(f2);
+	const merger = audio.createChannelMerger(2);
+	left.connect(merger, 0, 0);
+	right.connect(merger, 0, 1);
+	merger.connect(n);
+	return n;
+};
+
+const gain = (value, ...inputs) => {
+	const n = audio.createGain();
+	if (typeof value === 'number') {
+		n.gain.value = 0;
+		n.gain.setTargetAtTime(value, audio.currentTime, .08);
+	} else {
+		value.connect(n.gain);
+	}
+	for (let i = 0; i < inputs.length; ++i) {
+		inputs[i].connect(n);
+	}
+	return n;
+};
+
+const root_gain_value = .1;
+
+const root = (...o) => {
+	root_gain = gain(root_gain_value, ...o);
+	root_gain.connect(audio.destination);
+};
+
+// const wave = (v, p, w, f) => {
+// 	return gain(v, gain(frequency(1 / p), gain(frequency(w), frequency(f))));
+// }
+
+const main_test = () => {
+	timer_on();
+	root_gain = audio.createGain();
+	root_gain.connect(audio.destination);
+	root_gain.gain.value = 0;
+	root_gain.gain.setTargetAtTime(root_gain_value, audio.currentTime, 0.1);
+
+	const f1 = 60;
+	const b1 = 3;
+	const p1 = 60;
+	const f2 = phi * f1;
+	const b2 = phi * 3;
+	const p2 = phi * 60;
+	const f3 = (f1 + phi * phi * f2) / 2;
+	const b3 = (b1 + phi * phi * b2) / 2;
+	const p3 = (p1 + phi * phi * p2) / 2;
+
+	const g1 = gain(period(p1), binaural(f1, f1 + b1));
+	g1.gain.value = 1;
+	g1.connect(root_gain);
+	const g1f = () => {
+		g1.gain.setTargetAtTime(0, audio.currentTime         , .15 * p1);
+		g1.gain.setTargetAtTime(1, audio.currentTime + p1 / 2, .15 * p1);
+	};
+	g1f();
+	setInterval(g1f, p1 * 1000);
+
+	const g2 = gain(period(p2), binaural(f2, f2 + b2));
+	g2.gain.value = 1;
+	g2.connect(root_gain);
+	const g2f = () => {
+		g2.gain.setTargetAtTime(0, audio.currentTime         , .15 * p2);
+		g2.gain.setTargetAtTime(1, audio.currentTime + p2 / 2, .15 * p2);
+	};
+	g2f();
+	setInterval(g2f, p2 * 1000);
+
+	const g3 = gain(period(p3), binaural(f3, f3 + b3));
+	g3.gain.value = 1;
+	g3.connect(root_gain);
+	const g3f = () => {
+		g3.gain.setTargetAtTime(0, audio.currentTime         , .15 * p3);
+		g3.gain.setTargetAtTime(1, audio.currentTime + p3 / 2, .15 * p3);
+	};
+	g3f();
+	setInterval(g3f, p3 * 1000);
+};
+
+const main_electrical = () => {
+	const bf   = 60;
+	const bp   = 60;
+	const beat = 3;
+	const r    = phi;
+	root(
+		gain(period(bp)    , 0, binaural(bf    , beat    )), 
+		gain(period(bp * r), 0, binaural(bf * r, beat * r))
+//		gain(period(bp, bp / 4), 0, binaural(bf * r, beat * r, bp / 4))
+//		gain(period(bp), bp / 2, binaural(bf * r, beat * r))
+
+//		gain(frequency(1 / bp, bp / 4), binaural(bf * r, bd * r))
+	);
+};
+
+const main_1080p = () => {
+	const screen_width  = 1920;
+	const screen_height = 1080;
+	const r             = screen_width / screen_height;
+	const bf = 60.010; // screen refresh rate
+	const bp = bf * phi;
+	const bd = 3;
+	root(
+		gain(period(bp)        , binaural(bf    , bd    )), 
+		gain(period(bp, bp / 4), binaural(bf * r, bd * r))
+	);
+};
+
+const main_room = () => {
+	const room_depth  = 196;
+	const room_width  = 164.5;
+	const room_height = 107;
+	const r_dw        = room_depth / room_width;
+	const r_dh        = room_depth / room_height;
+	const r_wh        = room_width / room_height;
+	const bd          = 3;
+	const bf          = 105;
+	let bp            = bf;
+	// bp = 30; root(
+	// 	gain(frequency(1 / bp           ), binaural(bf       , bd       )),
+	// 	gain(frequency(1 / bp, bp * r_wh), binaural(bf * r_wh, bd * r_wh, bp * r_wh)),
+	// 	gain(frequency(1 / bp, bp * r_dh), binaural(bf * r_dh, bd * r_dh, bp * r_dh)),
+	// 	gain(frequency(1 / bp, bp * r_dw), binaural(bf * r_dw, bd * r_dw, bp * r_dw))
+	// );
+	// bp = 14; root(
+	// 	gain(frequency(1 / bp           ), binaural(bf       , bd       )), 
+	// 	gain(frequency(1 / bp, bp * r_wh), binaural(bf * r_wh, bd * r_wh)),
+	// 	gain(frequency(1 / bp, bp * r_dh), binaural(bf * r_dh, bd * r_dh)),
+	// 	gain(frequency(1 / bp, bp * r_dw), binaural(bf * r_dw, bd * r_dw))
+	// );
+	// root(
+	// 	gain(frequency(1 / bp           ), binaural(bf       , bd       )), 
+	// 	gain(frequency(1 / bp, bp * r_wh), binaural(bf * r_wh, bd * 1)),
+	// 	gain(frequency(1 / bp, bp * r_dh), binaural(bf * r_dh, bd * 1)),
+	// 	gain(frequency(1 / bp, bp * r_dw), binaural(bf * r_dw, bd * 1))
+	// );
+	// bp = 30; root(
+	// 	gain(frequency(1 / bp                ), binaural(bf       , bd       )), 
+	// 	gain(frequency(1 / bp, bp * 4        ), binaural(bf * r_wh, bd * r_wh)),
+	// 	gain(frequency(1 / bp, bp * 4 * 4    ), binaural(bf * r_dh, bd * r_dh)),
+	// 	gain(frequency(1 / bp, bp * 4 * 4 * 4), binaural(bf * r_dw, bd * r_dw))
+	// );
+	// bp = 30; root(
+	// 	gain(frequency(1 / bp                ), binaural(bf       , bd       )), 
+	// 	gain(frequency(1 / bp, bp * 4        ), binaural(bf * r_wh, bd * 1)),
+	// 	gain(frequency(1 / bp, bp * 4 * 4    ), binaural(bf * r_dh, bd * 1)),
+	// 	gain(frequency(1 / bp, bp * 4 * 4 * 4), binaural(bf * r_dw, bd * 1))
+	// );
+	// root(
+	// 	gain(frequency(1 / bp           ), binaural(bf       , bd       )), 
+	// 	gain(frequency(1 / bp, bp / 4   ), binaural(bf * r_dw, bd * r_dw))
+	// );
+};
+
+const start = () => {
+	audio = new (window.AudioContext || window.webkitAudioContext)();
+	main_test();
+//	main_electrical();
+//	main_1080p();
+//	main_room();
+};
+
+let timeout = null;
+
+g_start_start_button.addEventListener('click', _ => {
+	start();
+	g_start_container.style.display = 'none'; 
+	g_playing_container.style.display = 'flex';
+});
+g_start_back_button.addEventListener('click', _ => { 
+	location.href = './'; 
+});
+g_playing_pause_button.addEventListener('click', _ => { 
+	if (timeout) return;
+	root_gain.gain.setTargetAtTime(0, audio.currentTime, .08);
+	timeout = setTimeout(() => {
+		root_gain.gain.value = 0;
+		audio.suspend();
+		g_playing_container.style.display = 'none'; 
+		g_paused_container.style.display = 'flex'; 
+		timeout = null;
+		timer_off();
+	}, 300);
+});
+g_playing_black_button.addEventListener('click', _ => { 
+	g_playing_container.style.display = 'none'; 
+	g_black_container.style.display = 'flex'; 
+});
+g_playing_about_button.addEventListener('click', _ => { 
+	g_playing_container.style.display = 'none'; 
+	g_about_container.style.display = 'flex'; 
+});
+g_playing_exit_button.addEventListener('click', _ => { 
+	location.href = './'; 
+});
+g_paused_resume_button.addEventListener('click', _ => { 
+	if (timeout) return;
+	root_gain.gain.setTargetAtTime(1, audio.currentTime, .08);
+	timeout = setTimeout(() => {
+		audio.resume();
+		g_paused_container.style.display = 'none'; 
+		g_playing_container.style.display = 'flex'; 
+		timeout = null;
+		timer_on();
+	}, 300);
+});
+g_black_container.addEventListener('click', _ => { 
+	g_black_container.style.display = 'none'; 
+	g_playing_container.style.display = 'flex'; 
+});
+g_about_container.addEventListener('click', _ => { 
+	g_about_container.style.display = 'none'; 
+	g_playing_container.style.display = 'flex'; 
+});
+
+
+</script>
+</body>
+</html>

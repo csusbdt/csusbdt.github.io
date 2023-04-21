@@ -11,6 +11,9 @@ body {
 a {
     color: black;    
 }
+#content {
+	max-width: 36em;
+}
 </style>
 </head>
 <body>
@@ -20,7 +23,9 @@ a {
 		fetch("https://raw.githubusercontent.com/wiki/csusbdt/csusbdt.github.io/Blog.md", {cache: "no-store"})
 		.then(response => {
 			response.text().then(text => {
-				document.getElementById('content').innerHTML = marked.parse(text);
+				document.getElementById('content').innerHTML = 
+					'<div><a href="/">Home</a></div>' + 
+					marked.parse(text);
 			});
 		}); 
     </script>

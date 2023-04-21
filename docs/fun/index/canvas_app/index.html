@@ -1,0 +1,61 @@
+<html>
+<head>
+	<title></title>
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<style>
+		body {
+			padding: 0;
+			margin: 0;
+			background-color: black;
+		}
+		#container_div {
+			position: absolute;
+			top: 0;
+			left: 0;
+			padding: 0;
+			margin: 0;
+			width: 100%;
+			height: 100%;
+		}
+		#g_canvas {
+			position: absolute;
+			padding: 0;
+			margin: 0;
+		}
+		img {
+			display: none;
+		}
+	</style>
+</head>
+<body>
+	<!-- required elements: g_canvas and g_bg -->
+	<div id="g_container_div"><canvas id="g_canvas"></canvas></div>
+	
+	<img id="g_bg"              src="images/bg.png"              />
+	<img id="i_fullscreen"      src="images/fullscreen.png"      />
+	<img id="i_fullscreen_1"    src="images/fullscreen_1.png"    />
+	<img id="i_fullscreen_2"    src="images/fullscreen_2.png"    />
+	<img id="i_fullscreen_3"    src="images/fullscreen_3.png"    />
+	<img id="i_hi_0"            src="images/hi_0.png"            />
+	<img id="i_hi_1"            src="images/hi_1.png"            />
+	<img id="i_hi_2"            src="images/hi_2.png"            />
+	<img id="i_hi_3"            src="images/hi_3.png"            />
+	<img id="i_hi_4"            src="images/hi_4.png"            />
+	<img id="i_hi_5"            src="images/hi_5.png"            />
+	<img id="i_test_1"          src="images/test_1.png"          />
+	<img id="i_preferred_color" src="images/preferred_color.png" />
+	<img id="i_red"             src="images/red.png"             />
+	<img id="i_blue"            src="images/blue.png"            />
+	<img id="i_back"            src="images/back.png"            />
+	<img id="i_back_1"          src="images/back_1.png"          />
+	<img id="i_back_2"          src="images/back_2.png"          />
+	<img id="i_back_3"          src="images/back_3.png"          />
+
+	<audio id="s_thud"          src="sfx/thud.mp3"  preload="auto"></audio>
+	<audio id="s_click"         src="sfx/click.mp3" preload="auto"></audio>
+	<audio id="s_blop"          src="sfx/blop.mp3"  preload="auto"></audio>
+	<audio id="s_tick"          src="sfx/tick.mp3"  preload="auto"></audio>
+
+	<script type="module"       src="index.js"></script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<style>
+body {
+	background-color: #555555; 
+	color: #DDDDDD; 
+	margin: 2em;
+}
+#text {
+	display: none;
+	max-width: 20em;
+	font-size: 2em;
+}
+p { 
+}
+#start {
+	display: block;
+}
+</style>
+
+<h2 id='start'>click anywhere to start</h2>
+
+<div id='text'>
+	<p>
+	Composition 2
+	</p>
+	<p>
+	Lasted changed: March 27, 2021
+	</p>
+</div>
+
+<script>
+(function() {
+	let ctx = null;
+
+	function start_audio() {
+		const phi = 1.6180339887;
+
+		const w = ctx.createGain();
+		w.gain.value = 0;
+		w.gain.setTargetAtTime(.1, ctx.currentTime, 1);
+		w.connect(ctx.destination);
+
+		const w1 = ctx.createGain();
+		const w2 = ctx.createGain();
+		const w3 = ctx.createGain();
+		const w4 = ctx.createGain();
+
+		w1.gain.value = 1;
+		w2.gain.value = .8;
+		w3.gain.value = .4;
+		w4.gain.value = .1;
+
+		w1.connect(w);
+		w2.connect(w);
+		w3.connect(w);
+		w4.connect(w);
+
+		const a1 = ctx.createOscillator();
+		const a2 = ctx.createOscillator();
+		const a3 = ctx.createOscillator();
+		const a4 = ctx.createOscillator();
+		a1.frequency.value = 80;
+		a2.frequency.value = a1.frequency.value * phi;
+		a3.frequency.value = a2.frequency.value * phi;
+		a4.frequency.value = a3.frequency.value * phi;
+
+		const b1 = ctx.createOscillator();
+		const b2 = ctx.createOscillator();
+		const b3 = ctx.createOscillator();
+		const b4 = ctx.createOscillator();
+		b1.frequency.value = 3;
+		b2.frequency.value = 4;
+		b3.frequency.value = 5;
+		b4.frequency.value = 6;
+
+		const c1 = ctx.createOscillator();
+		const c2 = ctx.createOscillator();
+		const c3 = ctx.createOscillator();
+		const c4 = ctx.createOscillator();
+		c4.frequency.value = 1 / 10;
+		c3.frequency.value = c4.frequency.value / phi;
+		c2.frequency.value = c3.frequency.value / phi;
+		c1.frequency.value = c2.frequency.value / phi;
+
+		const d1 = ctx.createOscillator();
+		const d2 = ctx.createOscillator();
+		const d3 = ctx.createOscillator();
+		const d4 = ctx.createOscillator();
+		d4.frequency.value = 1 / 60 / 11;
+		d3.frequency.value = d4.frequency.value / phi;
+		d2.frequency.value = d3.frequency.value / phi;
+		d1.frequency.value = d2.frequency.value / phi;
+
+		const ab1 = ctx.createGain();
+		const ab2 = ctx.createGain();
+		const ab3 = ctx.createGain();
+		const ab4 = ctx.createGain();
+
+		const abc1 = ctx.createGain();
+		const abc2 = ctx.createGain();
+		const abc3 = ctx.createGain();
+		const abc4 = ctx.createGain();
+
+		const abcd1 = ctx.createGain();
+		const abcd2 = ctx.createGain();
+		const abcd3 = ctx.createGain();
+		const abcd4 = ctx.createGain();
+
+		a1.connect(ab1);
+		a2.connect(ab2);
+		a3.connect(ab3);
+		a4.connect(ab4);
+
+		b1.connect(ab1.gain);
+		b2.connect(ab2.gain);
+		b3.connect(ab3.gain);
+		b4.connect(ab4.gain);
+
+		ab1.connect(abc1);
+		ab2.connect(abc2);
+		ab3.connect(abc3);
+		ab4.connect(abc4);
+
+		c1.connect(abc1.gain);
+		c2.connect(abc2.gain);
+		c3.connect(abc3.gain);
+		c4.connect(abc4.gain);
+
+		abc1.connect(abcd1);
+		abc2.connect(abcd2);
+		abc3.connect(abcd3);
+		abc4.connect(abcd4);
+
+		d1.connect(abcd1.gain);
+		d2.connect(abcd2.gain);
+		d3.connect(abcd3.gain);
+		d4.connect(abcd4.gain);
+
+		abcd1.connect(w1);
+		abcd2.connect(w2);
+		abcd3.connect(w3);
+		abcd4.connect(w4);
+
+		setTimeout(() => {
+			a1.start();
+			b1.start();
+			c1.start();
+			d1.start();
+		}, 0);
+
+		setTimeout(() => {
+			a2.start();
+			b2.start();
+			c2.start();
+			d2.start();
+		}, 100);
+
+		setTimeout(() => {
+			a3.start();
+			b3.start();
+			c3.start();
+			d3.start();
+		}, 250);
+
+		setTimeout(() => {
+			a4.start();
+			b4.start();
+			c4.start();
+			d4.start();
+		}, 660);
+	}
+
+	function start() {
+		function toggle() {
+			if (ctx.state === 'running') {
+				ctx.suspend();
+			} else {
+				ctx.resume();
+			}
+		}
+		document.getElementById('start').style.display = 'none';
+		document.getElementById('text').style.display = 'block';
+		ctx = new (window.AudioContext || window.webkitAudioContext)();
+		function resume() {
+			setTimeout(() => {
+				ctx.resume();
+				if (ctx.state === 'running') {
+					start_audio();
+					const options = { capture: true, passive: false, once: false };
+					document.body.addEventListener('mousedown', e => {
+						toggle();
+						e.preventDefault();
+						e.stopPropagation();
+						document.body.removeEventListener('touchstart', options);
+					}, options);
+					document.body.addEventListener('touchstart', e => {
+						toggle();
+						e.preventDefault();
+						e.stopPropagation();
+						document.body.removeEventListener('mousedown', options);
+					}, options);
+				} else {
+					return resume();
+				}
+			}, 10);
+		}
+		resume();
+	}
+
+	const options = { capture: true, passive: false, once: true };
+
+	document.body.addEventListener('mousedown', e => {
+		start();
+		e.preventDefault();
+		e.stopPropagation();
+		document.body.removeEventListener('touchstart', options);
+	}, options);
+
+	document.body.addEventListener('touchstart', e => {
+		start();
+		e.preventDefault();
+		e.stopPropagation();
+		document.body.removeEventListener('mousedown', options);
+	}, options);
+
+})();
+</script>

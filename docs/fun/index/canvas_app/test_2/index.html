@@ -1,0 +1,48 @@
+<html>
+<head>
+	<title></title>
+	<style>
+		body {
+			padding: 0;
+			margin: 0;
+			background-color: black;
+		}
+		#container_div {
+			position: absolute;
+			top: 0;
+			left: 0;
+			padding: 0;
+			margin: 0;
+			width: 100%;
+			height: 100%;
+		}
+		#g_canvas {
+			position: absolute;
+			padding: 0;
+			margin: 0;
+		}
+		img {
+			display: none;
+		}
+	</style>
+</head>
+<body>
+	<div id="g_container_div"><canvas id="g_canvas"></canvas></div>
+	<img id="g_bg"          src="../test_1/images/bg.png"           />
+	<img id="i_pick_screen" src="../test_1/images/fullscreen.png"   />
+	<img id="i_door"        src="../test_1/images/door.png"         />
+	<img id="i_exit_0"      src="../test_1/images/exit_0.png"       />
+	<img id="i_exit_1"      src="../test_1/images/exit_1.png"       />
+	<img id="i_exit_2"      src="../test_1/images/exit_2.png"       />
+	<img id="i_idle1_0"     src="../test_1/images/idle1_0.png"      /> 
+	<img id="i_idle1_1"     src="../test_1/images/idle1_1.png"      />
+	<img id="i_idle1_2"     src="../test_1/images/idle1_2.png"      />
+
+	<audio id="s_thud"      src="../sfx/thud.mp3"  preload="auto"></audio>
+	<audio id="s_click"     src="../sfx/click.mp3" preload="auto"></audio>
+	<audio id="s_blop"      src="../sfx/blop.mp3"  preload="auto"></audio>
+	<audio id="s_tick"      src="../sfx/tick.mp3"  preload="auto"></audio>
+
+	<script type="module"   src="index.js"></script>
+</body>
+</html>

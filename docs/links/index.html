@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Links</title>
+<title>A Sampling of Videos I Enjoyed</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <style>
 body {
@@ -8,16 +8,22 @@ body {
     margin: 0;
     padding: 20;
 }
+#title {
+	font-size: larger;
+	font-weight: bolder;
+}
 a {
     color: black;    
 }
 </style>
 </head>
 <body>
+	<div id="title">A Sampling of Videos I Enjoyed</div>
+	<div style="margin-top: 1em"><a href="../">back</a></div>
     <div id="content"></div>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script type="module">
-		fetch("https://raw.githubusercontent.com/wiki/csusbdt/csusbdt.github.io/Links.md", {cache: "no-store"})
+		fetch("https://raw.githubusercontent.com/wiki/csusbdt/csusbdt.github.io/A-Sampling-of-Videos-I-Enjoyed.md", {cache: "no-store"})
 		.then(response => {
 			response.text().then(text => {
 				document.getElementById('content').innerHTML = marked.parse(text);

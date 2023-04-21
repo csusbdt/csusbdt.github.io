@@ -1,0 +1,259 @@
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<style>
+		body {
+			padding: 0;
+			margin: 0;
+		}
+		#g_content_div {
+			display: block;
+			margin: 0;
+			font-size: 6vh;
+			text-align: center;
+		}
+		button {
+			margin-top: 3vh;
+			margin-left: 3vw;
+			margin-right: 3vw;
+			height: 14vh;
+			font-size: 4vh;
+			padding: 0;
+		}
+		input {
+			margin-top: 3vh;
+			width: 20vw;
+			font-size: 8vh;
+		}
+		#g_play {
+			width: 93vw;
+		}
+		#g_change {
+			width: 93vw;
+		}
+		#g_instructions {
+			width: 45vw;
+			margin-left: 0;
+			margin-right: 0;
+		}
+		#g_go_black {
+			width: 45vw;
+			margin-right: 0;
+		}
+		#g_instructions_div {
+			display: none;
+			width: 100%;
+			height: 100%;
+			margin: 5vmin;
+			background-color: white;
+			font-size: 4vh;
+			font-family: sans-serif;
+		}
+		#g_black_div {
+			display: none;
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			background-color: black;
+		}
+	</style>
+</head>
+<body>
+<div id='g_content_div'
+	><button id='g_play'>start</button><br
+	>v: <input id='g_v'/> <br
+	>f: <input id='g_f'/> <br
+	>a: <input id='g_a'/> <br
+	>p: <input id='g_p'/> <br
+	><button id='g_change'>change</button><br
+	><button id='g_instructions'>instructions</button
+	><button id='g_go_black'>go black</button
+></div>
+<div id='g_instructions_div'>
+Use headphones or sound system with a woofer.
+<br><br>
+Use for relaxation and inducing sleep.
+<br><br>
+Adjust parameters to suit.
+<br><br>
+Some changes may take time to notice.
+<br><br>
+Small changes are significant.
+<br><br>
+Play simultaneously in 2 or more tabs with different parameters.
+<br><br>
+v = volume (0 to 100)
+<br>
+f = base frequency
+<br>
+a = woble frequency
+<br>
+p = period
+</div>
+<div id='g_black_div'></div>
+<script type="module">
+const phi = 1.6180339887;
+let audio = null;
+
+let w  = null;
+let o1 = null;
+let a1 = null;
+let p1 = null;
+
+let v = 10;
+let f = 80;
+let a = 3;
+let p = 10;
+
+const init = () => {
+	audio = new (window.AudioContext || window.webkitAudioContext)();
+	w = audio.createGain();
+	g_v.value = v;
+
+	w.gain.value = 0;
+	w.connect(audio.destination);
+
+	o1 = audio.createOscillator();
+
+	g_f.value = f;
+	o1.frequency.value = g_f.value;
+
+	a1 = audio.createOscillator();
+
+	g_a.value = a;
+	a1.frequency.value = g_a.value;
+
+	p1 = audio.createOscillator();
+
+	g_p.value = p;
+	p1.frequency.value = 1 / g_p.value;
+
+	const oa1 = audio.createGain();
+
+	const oap1 = audio.createGain();
+
+	o1.connect(oa1);
+
+	a1.connect(oa1.gain);
+
+	oa1.connect(oap1);
+
+	p1.connect(oap1.gain);
+
+	oap1.connect(w);
+
+	o1.start();
+	a1.start();
+	p1.start();
+
+	audio.suspend();
+
+	g_play.innerHTML = "play";
+};
+
+let timeout = null;
+
+g_play.addEventListener('click', _ => {
+	if (audio === null) {
+		init();
+		g_v.style.backgroundColor = 'lightgreen';
+		g_f.style.backgroundColor = 'lightgreen';
+		g_a.style.backgroundColor = 'lightgreen';
+		g_p.style.backgroundColor = 'lightgreen';
+	} else if (g_play.innerHTML === 'play') {
+		audio.resume();
+		w.gain.setTargetAtTime(v / 100, audio.currentTime, .1);
+		g_play.innerHTML = 'pause';
+	} else if (g_play.innerHTML === 'pause') {
+		if (timeout) return;
+		w.gain.setTargetAtTime(0, audio.currentTime, .1);
+		timeout = setTimeout(() => {
+			audio.suspend();
+			g_play.innerHTML = 'resume';
+			timeout = null;
+		}, 300);
+	} else if (g_play.innerHTML === 'resume') {
+		if (timeout) return;
+		w.gain.setTargetAtTime(v / 100, audio.currentTime, .1);
+		timeout = setTimeout(() => {
+			audio.resume();
+			g_play.innerHTML = 'pause';
+			timeout = null;
+		}, 300);
+	}
+});
+
+g_v.addEventListener('input', _ => {
+	if (g_v.value > 100) {
+		g_v.value = v;
+	}
+	if (g_v.value !== v) {
+		g_v.style.backgroundColor = 'pink';
+	} else {
+		g_v.style.backgroundColor = 'lightgreen';
+	}
+	v = g_v.value;
+});
+
+g_f.addEventListener('input', _ => {
+	if (g_f.value !== f) {
+		g_f.style.backgroundColor = 'pink';
+	} else {
+		g_f.style.backgroundColor = 'lightgreen';
+	}
+	f = g_f.value;
+});
+
+g_a.addEventListener('input', _ => {
+	if (g_a.value !== a) {
+		g_a.style.backgroundColor = 'pink';
+	} else {
+		g_a.style.backgroundColor = 'lightgreen';
+	}
+	a = g_a.value;
+});
+
+g_p.addEventListener('input', _ => {
+	if (g_p.value !== p) {
+		g_p.style.backgroundColor = 'pink';
+	} else {
+		g_p.style.backgroundColor = 'lightgreen';
+	}
+	p = g_p.value;
+});
+
+g_change.addEventListener('click', _ => {
+	w.gain.setTargetAtTime(v / 100, audio.currentTime, .1);
+	o1.frequency.setTargetAtTime(f, audio.currentTime, .1);
+	a1.frequency.setTargetAtTime(a, audio.currentTime, .1);
+	p1.frequency.setTargetAtTime(1 / p, audio.currentTime, .1);
+	g_v.style.backgroundColor = 'lightgreen';
+	g_f.style.backgroundColor = 'lightgreen';
+	g_a.style.backgroundColor = 'lightgreen';
+	g_p.style.backgroundColor = 'lightgreen';
+});
+
+g_instructions.addEventListener('click', _ => {
+	g_content_div.style.display = 'none';
+	g_instructions_div.style.display = 'block';
+	g_black_div.style.display = 'none';
+});
+
+g_go_black.addEventListener('click', _ => {
+	g_content_div.style.display = 'none';
+	g_instructions_div.style.display = 'none';
+	g_black_div.style.display = 'block';
+});
+
+g_instructions_div.addEventListener('click', _ => {
+	g_content_div.style.display = 'block';
+	g_instructions_div.style.display = 'none';
+});
+
+g_black_div.addEventListener('click', _ => {
+	g_content_div.style.display = 'block';
+	g_black_div.style.display = 'none';
+});
+</script>
+</body>
+</html>

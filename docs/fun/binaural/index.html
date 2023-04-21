@@ -1,0 +1,75 @@
+<html>
+<head>
+<title>Binaural Beat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<style>
+body {
+    background-color: #cccccc;
+    background-color: #aaa;
+    margin: 0;
+    padding: 3vh 3vw;
+}
+a {
+    color: black;    
+}
+canvas {
+/*  margin-right: 1.0em; */
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+}
+/*
+.container div {
+  margin-left: 1.0em;
+}
+*/
+#g_local_time {
+  display: none;
+}
+</style>
+</head>
+<body>
+	
+<link href="../main.css" rel="stylesheet">
+
+	Base frequency: <input id="input_f" value='120'   /><br>
+	Binaural beat:  <input id="input_b" value='3.5'    /><br>
+	<input id="input_s" type='submit' /><br>
+	<br>
+	<a href="../">back</a>
+
+<script>
+
+let audio  = null;
+let merger = null;
+let o_0    = null;
+let o_1    = null;
+
+input_s.addEventListener('click', _ => {
+    if (audio === null) {
+		audio = new (window.AudioContext || window.webkitAudioContext)();
+		merger = new ChannelMergerNode(audio, { numberOfInputs: 2 });
+		merger.connect(audio.destination);
+		o_0 = audio.createOscillator();
+		o_1 = audio.createOscillator();
+		o_0.connect(merger, 0, 0);
+		o_1.connect(merger, 0, 1);
+	    o_0.start();
+	    o_1.start();	
+	}
+
+	const f = parseInt(input_f.value);
+	const b = parseInt(input_b.value);
+
+    o_0.frequency.value = f; 
+    o_1.frequency.value = f + b;
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,466 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="David A. Turner">
+<STYLE type="text/css">
+.super { font-size: smaller; position: relative; top:-3px }
+.sub { font-size: smaller; position: relative; top:3px }
+</STYLE>
+<TITLE>Optimal Streaming of Layer-Encoded Multimedia Presentations</TITLE>
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080" BGCOLOR="#faebd7">
+
+IEEE International Conference on Multimedia &amp; Expo 2000<BR>
+New York, New York<BR>
+Electronic Proceedings<BR>
+&copy; 1999 IEEE 
+
+<P><HR></P>
+
+<CENTER>
+<H1>Optimal Streaming of Layer-Encoded Multimedia Presentations</H1>
+</CENTER>
+
+<P>
+<DL>
+<DT><STRONG>David A. Turner</STRONG></DT>
+<DD>Institut Eurecom<BR>
+    Sophia Antipolis, France<BR>
+    +33 (0)4 93 00 26 98<BR>
+    turner@eurecom.fr<BR>
+    <A HREF="http://www.eurecom.fr/~turner">http://www.eurecom.fr/~turner</A></DD>
+</DL>
+
+<DL>
+<DT><STRONG>Keith W. Ross</STRONG></DT>
+<DD>Institut Eurecom<BR>
+    Sophia Antipolis, France<BR>
+    +33 (0)4 93 00 26 97<BR>
+    ross@eurecom.fr<BR>
+    <A HREF="http://www.eurecom.fr/~ross">http://www.eurecom.fr/~ross</A></DD>
+</DL>
+</P>
+
+<P><HR></P>
+
+<H2>Abstract</H2>
+<P>
+In the context of communication networks with no QoS guarantees, we describe the problem of streaming layer encoded multimedia presentation data as a two-phase decision problem.  We propose a measure of presentation quality called the <STRONG>refined max-min</STRONG> metric that yields a computationally inexpensive algorithm for determining an optimal transmission policy needed within the second decision making phase.  We compare this metric with a more traditional one, called the <STRONG>total quality</STRONG> metric, which yields an optimization problem that can be solved with dynamic programming.  Using a slide show presentation with a randomly generated sequence of layer-encoded JPEG images, we compare the refined max-min criterion with the total quality criterion.
+</P>
+
+<P><HR></P>
+
+<H2><A NAME="toc">Table of Contents</A></H2>
+
+<OL>
+<LI><A HREF="#intro">Introduction</A></LI>
+<LI><A HREF="#phase1">Phase One: Determining Startup Delay</A></LI>
+<LI><A HREF="#phase2">Phase Two: Layer Selection</A></LI>
+<LI><A HREF="#maxmin">The Refined Max-Min Criterion</A></LI>
+<LI><A HREF="#total">The Total Quality Criterion</A></LI>
+<LI><A HREF="#results">Experimental Results</A></LI>
+<LI><A HREF="#references">References</A> </LI>
+</OL>
+
+<P><HR></P>
+
+<H2><A NAME="intro">1. Introduction</A></H2>
+
+<P>
+The advantage of layer-encoding multimedia presentation data is that some layers can be dropped to reduce the size of the data representation, which will increase the speed at which the presentation can be transported over a bandwidth-limited network.  With faster transmission, the end user is saved from waiting for presentation data to be pre-fetched into a playback buffer.  
+However, fewer layers means lower quality, so we would like to send as many layers as possible while keeping the start up latency to a minimum.
+</P>
+
+<P>
+Frequently a distinction is made between continuous and discrete media;   audio and video are classified as continuous, while still images and text are classified as discrete.  The data comprising a discrete object must arrive in its entirety at the client prior to its rendering interval, but the rendering of a continuous media object can be started before all of its data arrives at the client.  In our approach, we decompose continuous media into separate discrete objects with relatively short rendering periods.  This allows us to treat all data components of the presentation as atomic units with arrival deadlines at the client equal to the starting point of their rendering intervals.
+</P>
+
+<P>
+Let <I>N</I> represent the number of discrete objects in the presentation after decomposition of the continuous media, and let
+<I>t<SPAN class="sub">i</SPAN></I> 
+represent the starting point of the initial rendering interval of object <I>i</I>.  We assume the objects are ordered by increasing values of their deadlines.  We measure time relative to the start of the presentation, so that the presentation starts at time <I>t=0</I>.
+</P>
+
+<P>
+We assume that a presentation comprised of only the first layer of each object represents a presentation of minimum acceptable quality.  We will use the term <STRONG>base layer</STRONG> when referring to the first layer, and <STRONG>enhancement layer</STRONG> when referring to higher layers, which contribute to quality but are not required for achieving the minimum quality level.  We let 
+<I>L<SPAN class="sub">i</SPAN></I> 
+represent the number of layers in object <I>i</I>.
+</P>
+
+<P>
+Our first priority is to minimize the start up delay for play out of only the base layers of the presentation.  After establishing the minimum start up delay, our second priority is to improve the quality of the presentation by sending enhancement layers.  Corresponding to these two priorities, we have two decision phases through which the application passes.  In the first phase, the application simply sends base layers for the objects in the order of their first appearance in the presentation.  While it is sending base layer data, it collects information about the available bandwidth and uses it to decide when to start playing the presentation.  After the presentation starts playing, the application enters into the second phase in which it loops on the decision of which layer to send next.
+</P>
+
+<P>
+The contribution of this paper is first to articulate the two-phase decision problem when streaming adaptive multimedia data, and second, to propose a new presentation quality metric called the <STRONG>refined max-min</STRONG> metric that yields a computationally inexpensive algorithm for efficiently determining the optimal layer to send in phase two.  We compare this approach with a more traditional metric, called the <STRONG>total quality</STRONG> metric, which yields a decision problem that can be solved with dynamic programming.  Using a slide show presentation with a randomly generated sequence of layer-encoded JPEG images, we compare the refined max-min criterion with the total quality criterion.
+</P>
+
+<H5><A HREF="#toc"><-- Back to Table of Contents></A></H5>
+
+<P><HR></P>
+
+<H2><A NAME="phase1">2. Phase One: Determining Startup Delay</A></H2>
+
+<P>
+Because we are transmitting data over a network with no QoS guarantees, after a communication channel is established, the application does not know the rate at which it can transmit data from source to destination.  For this reason, the application begins by transmitting only base layer data, which it stores in a pre-fetch buffer at the client until it determines that it can safely begin play out of the presentation without the threat of the presentation stalling.  (We assume the client has a disk drive large enough to store any amount of pre-fetched data.)
+</P>
+
+<P>
+While the application is transmitting base layers, it performs two other tasks in parallel.  First, it records a packet transmission history, which it uses for predicting future bandwidth.  Second, it loops on the decision whether to begin playing the presentation.
+</P>
+
+<P>
+We do not assume any particular transport protocol, such as TCP or some UDP-based scheme.  However, for whatever transport mechanism is employed, we assume the application has a reasonable method of estimating from the packet transmission history a lower bound for expected future bandwidth.  We let <I>B(a,b)</I> represent a lower bound for the number of bits the application expects can be delivered from server to client in the interval <I>[a,b]</I>.
+</P>
+
+<P>
+Suppose the application has delivered the base layers of objects 1 through <I>q-1</I> to the client, and is now considering whether to start play out.  Let 
+<I>x<SPAN class="sub">i,j</SPAN></I> 
+be the number of bits in the 
+<I>j<SPAN class="super">th</SPAN></I> 
+layer of object <I>i</I>.  If the application starts play out now, all of the unsent base layers will arrive on-time if the cumulative bits needed at each deadline is less than or equal to the cumulative bits that can be delivered.  Thus, the application starts play out if the following inequalities are satisfied:
+<BLOCKQUOTE>
+<I>
+x<SPAN class="sub">q,1</SPAN> &lt;= B(0,t<SPAN class="sub">q</SPAN>)<BR>
+x<SPAN class="sub">q,1</SPAN> + x<SPAN class="sub">q+1,1</SPAN> &lt;=
+B(0,t<SPAN class="sub">q+1</SPAN>)<BR>
+...<BR>
+x<SPAN class="sub">q,1</SPAN> + ... + x<SPAN class="sub">N,1</SPAN> &lt;=
+B(0,t<SPAN class="sub">N</SPAN>)
+</I>
+</BLOCKQUOTE>
+</P>
+
+<P>
+If this system of inequalities is not satisfied, the application does not begin play out, but continues to pre-fetch additional base layers.
+</P>
+
+<H5><A HREF="#toc"><-- Back to Table of Contents></A></H5>
+
+<P><HR></P>
+
+<H2><A NAME="phase2">3. Phase Two: Layer Selection</A></H2>
+
+<P>
+After the application gives the command to start playback, it transitions into phase two, in which it loops on the decision of which layer to send next.  To make this decision, the application continues to record transmission statistics and refine its estimate of a lower bound on future bandwidth.  With this lower bound, it determines a sequence of layers <I>P</I> (which we call a transmission policy) that can be delivered on-time (which we call feasibility) and that maximizes an objective measure of presentation quality <I>Q(P)</I>.  The first layer in the sequence comprising this policy is chosen to be transmitted next.
+</P>
+
+<P>
+Suppose that the rendering of the first <I>r</I> objects have already started, so the application only needs to concern itself with scheduling the delivery of objects <I>r + 1</I> to <I>N</I>.  To simplify notation, we re-label these objects as 1 through <I>M</I>.
+</P>
+
+<P>
+A transmission policy specifies the number of layers to send for each object, which we represent as an M-dimensional vector <I>P</I> whose 
+<I>i<SPAN class="super">th</SPAN></I> 
+component 
+<I>j<SPAN class="sub">i</SPAN></I> 
+represents the number of layers of object <I>i</I> to send to the client.  We call a policy <STRONG>feasible</STRONG> if all of the bits it sends arrive at the client prior to their deadlines.
+</P>
+
+<P>
+Let 
+<I>
+b<SPAN class="sub">i</SPAN> = 
+B(t<SPAN class="sub">i-1</SPAN>, t<SPAN class="sub">i</SPAN>)
+</I>, 
+the number of bits that can be transmitted between the deadlines 
+<I>t<SPAN class="sub">i-1</SPAN></I>
+and 
+<I>t<SPAN class="sub">i</SPAN></I>.
+At each deadline, the cumulative number of bits needed must be less than or equal to the cumulative bits that will be transmitted.  Thus, if we let 
+<I>y<SPAN class="sub">i</SPAN>(j)</I> 
+equal the unsent bits of object <I>i</I> that appear in layers 1 through <I>j</I>, then policy <I>P</I> is feasible if the following system of <I>M</I> inequalities hold.
+</P>
+
+<BLOCKQUOTE>
+<I>
+y<SPAN class="sub">1</SPAN>(j<SPAN class="sub">1</SPAN>) &lt;=
+b<SPAN class="sub">1</SPAN><BR>
+y<SPAN class="sub">1</SPAN>(j<SPAN class="sub">1</SPAN>) +
+y<SPAN class="sub">2</SPAN>(j<SPAN class="sub">2</SPAN>) &lt;=
+b<SPAN class="sub">1</SPAN> + b<SPAN class="sub">2</SPAN><BR>
+...<BR>
+y<SPAN class="sub">1</SPAN>(j<SPAN class="sub">1</SPAN>) + ... +
+y<SPAN class="sub">M</SPAN>(j<SPAN class="sub">M</SPAN>) &lt;=
+b<SPAN class="sub">1</SPAN> + b<SPAN class="sub">M</SPAN>
+</I>
+</BLOCKQUOTE>
+
+<P>
+Now that we have defined the set of feasible policies, we need to determine which of these policies are optimal, that is, which policies result in presentations with the best quality.  In the following two sections, we consider two measures of overall presentation quality, and provide algorithms that converge to optimal policies.
+</P>
+
+<H5><A HREF="#toc"><-- Back to Table of Contents></A></H5>
+
+<P><HR></P>
+
+<H2><A NAME="maxmin">4. The Refined Max-Min Criterion</A></H2>
+
+<P>
+In this and subsequent sections, we assume a general measure 
+<I>q<SPAN class="sub">i</SPAN>(j)</I> 
+for the quality of an <STRONG>individual</STRONG> object <I>i</I> when layers 1 through <I>j</I> are used for its rendering.  One possible measure of <STRONG>overall</STRONG> presentation quality is simply to take the worst object quality.  A feasible policy would then be optimal if it were to maximize the minimum quality across all objects in the presentation.  We call this the <STRONG>max-min criterion</STRONG>.
+</P>
+
+<P>
+Although the max-min criterion is a natural choice for a criterion of optimality, it typically provides policies that do not allocate all the available bandwidth.  Consequently, sending additional layers for some objects may be possible, which, although not increasing the minimum quality, clearly improves the overall quality of the presentation.  Also, less cumulative bandwidth in general will be available for transmitting objects with earlier deadlines, thus the minimum attainable quality will be dominated by bandwidth available for the early objects. We now consider a <STRONG>refined max-min criterion</STRONG> that overcomes these inadequacies.
+</P>
+
+<P>
+We represent the overall quality of a presentation as a vector rather than a scalar, and define an ordering of these vectors.  Let 
+<I>A = (j<SPAN class="sub">1</SPAN> ,..., j<SPAN class="sub">M</SPAN>)</I> 
+and 
+<I>B = (k<SPAN class="sub">1</SPAN> ,..., k<SPAN class="sub">M</SPAN>)</I>
+be two feasible policies with quality vectors:
+</P>
+
+<BLOCKQUOTE>
+<I>
+Q(A) = (q<SPAN class="sub">1</SPAN>(j<SPAN class="sub">1</SPAN>)
+,...,
+q<SPAN class="sub">N</SPAN>(j<SPAN class="sub">M</SPAN>))
+<BR>
+Q(B) = (q<SPAN class="sub">1</SPAN>(k<SPAN class="sub">1</SPAN>)
+,...,
+q<SPAN class="sub">N</SPAN>(k<SPAN class="sub">M</SPAN>))
+</I>
+</BLOCKQUOTE>
+
+<P>
+Now sort the elements in these quality vectors from lowest to highest to obtain the sorted quality vectors 
+<I>(a<SPAN class="sub">1</SPAN> ,..., a<SPAN class="sub">M</SPAN>)</I> 
+and 
+<I>(b<SPAN class="sub">1</SPAN> ,..., b<SPAN class="sub">M</SPAN>)</I>, 
+respectively.  We say that policy <I>A</I> has better quality than policy <I>B</I> if the sorted quality vectors are equal until some position <I>k</I> where the quality value of <I>A</I> is greater than that of <I>B</I>.  That is, <I>Q(A) &gt; Q(B)</I> if there exists a <I>k</I> such that 
+<I>a<SPAN class="sub">i</SPAN> = b<SPAN class="sub">i</SPAN></I> 
+for 
+<I>i &lt; k</I>, 
+but that 
+<I>a<SPAN class="sub">k</SPAN> &gt; b<SPAN class="sub">k</SPAN></I>. 
+A feasible policy <I>A</I> is said to be optimal if there does not exist another feasible policy <I>B</I> such that <I>Q(A) &lt; Q(B)</I>. We refer to this as the refined max-min criterion.
+</P>
+
+<P>
+It is important to note that if a policy is optimal for the refined max-min criterion, then it is also optimal for the max-min criterion.  However, the converse is not generally true.  Thus, the refined max-min criterion is a more sensible measure for the overall quality of a presentation, because in addition to satisfying the max-min criterion, it better exploits the available bandwidth to improve the quality of the presentation.
+</P>
+
+<P>
+We now present an algorithm that determines the optimal policy under the assumption that the quality values 
+<I>q<SPAN class="sub">i</SPAN>(j)</I> 
+are distinct for all values of <I>i</I> and <I>j</I>.  Quality measures that utilize the length of time rendered, root mean square, or the number of bits, typically fulfill this assumption.  The algorithm (Fig.&nbsp;1) starts with a policy set to the layers that have already been sent to the client, and then enters a loop in which it tries to add a layer to the object with lowest quality.  If adding a layer to this object results in a non-feasible policy, then its layers are held fixed, and it is removed from any further consideration.  That this algorithm converges to an optimal policy is intuitively clear.  (See <A HREF="#ref1">[1]</A> for a formal proof of convergence.)
+</P>
+
+<PRE>
+     P = seq. of sent layers
+     S = {1 ,..., N}
+     do while P != (L<SPAN class="sub">i</SPAN> ,..., L<SPAN class="sub">N</SPAN>) and S is not empty
+          find k in S s.t. q<SPAN class="sub">k</SPAN>(j_{k}) &lt;= q<SPAN class="sub">i</SPAN>(j<SPAN class="sub">i</SPAN>) for all i in S
+          if (j<SPAN class="sub">1</SPAN> ,..., j<SPAN class="sub">k</SPAN>+1 ,..., j<SPAN class="sub">N</SPAN>) is feasible then
+               j<SPAN class="sub">k</SPAN> = j<SPAN class="sub">k</SPAN> + 1
+          else
+               remove k from S
+</PRE>
+<P align="center"><STRONG>Figure 1.</STRONG> Refined max-min algorithm</P>
+
+<P>
+For object quality measures that map into a relatively small range, such as
+<I>q<SPAN class="sub">i</SPAN>(j) = j</I>,
+this algorithm may not converge to an optimal policy, because it does not properly resolve quality ties.  We propose (and evaluate in Sec.&nbsp;6) the following tie-breaking heuristic:  <I>In the presence of a quality tie, choose the object whose next layer has the smallest number of bits.</I>  Intuitively, this heuristic makes sense, because we are improving the quality by one layer with the least expenditure of bandwidth.
+</P>
+
+<H5><A HREF="#toc"><-- Back to Table of Contents></A></H5>
+
+<P><HR></P>
+
+<H2><A NAME="total">5. The Total Quality Criterion</A></H2>
+
+<P>
+A more traditional approach to the optimization problem would be to define presentation quality as the sum of the quality values of the individual objects.  We refer to this measure as the presentation's <STRONG>total quality</STRONG>.
+</P>
+
+<P>
+The maximization of <I>Q(P)</I> over the set of feasible polices can be formulated as a characteristic equation of dynamic programming.  To see this, suppose we want to send objects <I>m</I> through <I>M</I>, and that we have <I>s</I> surplus bits of bandwidth available to do this, in addition to the
+<I>b<SPAN class="sub">m</SPAN> ,..., b<SPAN class="sub">M</SPAN></I> 
+bits that are available in the intervals terminating at deadlines 
+<I>t<SPAN class="sub">m</SPAN> ,..., t<SPAN class="sub">M</SPAN></I>.  
+Define <I>f(m,s)</I> to be the maximum quality attainable for these objects.  That is,
+<BLOCKQUOTE>
+f(m,s) = max(q<SPAN class="sub">m</SPAN>(j<SPAN class="sub">m</SPAN>) 
++ ... + 
+q<SPAN class="sub">M</SPAN>(j<SPAN class="sub">M</SPAN>)),
+</BLOCKQUOTE>
+where the max is taken over all 
+<I>(j<SPAN class="sub">m</SPAN> ,..., j<SPAN class="sub">M</SPAN>)</I> 
+that satisfy the following deadline constraints:
+</P>
+
+<BLOCKQUOTE>
+y<SPAN class="sub">m</SPAN>(j<SPAN class="sub">m</SPAN>) &lt;= s + b<SPAN class="sub">m</SPAN>
+<BR>
+y<SPAN class="sub">m</SPAN>(j<SPAN class="sub">m</SPAN>) + 
+y<SPAN class="sub">m+1</SPAN>(j<SPAN class="sub">m+1</SPAN>) &lt;=
+s + b<SPAN class="sub">m</SPAN> + b<SPAN class="sub">m+1</SPAN>
+<BR>
+...
+<BR>
+y<SPAN class="sub">m</SPAN>(j<SPAN class="sub">m</SPAN>) 
++ ... + 
+y<SPAN class="sub">M</SPAN>(j<SPAN class="sub">M</SPAN>) &lt;=
+s + b<SPAN class="sub">m</SPAN> + ... + b<SPAN class="sub">M</SPAN>
+</BLOCKQUOTE>
+
+<P>
+By definition, <I>f(1,0)</I> is the maximum quality for the presentation.
+</P>
+
+<P>
+It can be shown that <I>f</I> has the following recursive form.  (See <A HREF="#ref1">[1]</A> for a proof of this.)
+</P>
+
+<P>
+For <I>m = 1 ,..., M-1</I>,
+</P>
+
+<BLOCKQUOTE>
+<I>
+f(m,s) = 
+max( q<SPAN class="sub">m</SPAN>(j) + 
+f(m+1, s+b<SPAN class="sub">m</SPAN>-y<SPAN class="sub">m</SPAN>(j)) ),
+</I>
+</BLOCKQUOTE>
+
+<P>
+where the maximization is taken over the set of all <I>j</I> such that
+<I>y<SPAN class="sub">m</SPAN>(j) &lt;= s + b<SPAN class="sub">m</SPAN></I>.
+</P>
+
+<P>
+For <I>m = M</I>,
+</P>
+
+<BLOCKQUOTE>
+<I>
+f(M,s) = max( q<SPAN class="sub">M</SPAN>(j) ),
+</I>
+</BLOCKQUOTE>
+
+<P>
+where the maximization is taken over the set of all <I>j</I> such that
+<I>y<SPAN class="sub">M</SPAN>(j) &lt;= s + b<SPAN class="sub">M</SPAN></I>.
+</P>
+
+<P>
+Standard dynamic programming techniques can be employed to determine in polynomial time the optimal policy from these equations <A HREF="#ref2">[2]</A>.
+</P>
+
+<H5><A HREF="#toc"><-- Back to Table of Contents></A></H5>
+
+<P><HR></P>
+
+<H2><A NAME="results">6. Experimental Results</A></H2>
+
+<P>
+We assembled a slide show presentation with 2 black and white and 8 color JPEG images in order to compare the refined max-min criterion with the total quality criterion under two different object quality measures.  The black and white images were encoded into 6 layers, and the color images were encoded into 10 layers.  The two object quality measures were a layer-oriented measure, which equates quality with the ratio of layers rendered to the total number of layers in the object, and a bit-oriented quality measure, which equates quality with the ratio of bits rendered to total bits from all layers.  Note that under the bit-oriented measure, convergence to an optimal refined max-min policy is guaranteed.
+</P>
+
+<P>
+Fig.&nbsp;2 shows the percentage of layers sent for each of the ten objects in the presentation for the refined max-min and total quality criteria under the layer-oriented quality measure.  The resulting policies of the two algorithms appear to agree in general regarding which images should be weak (in terms of percentage of layers rendered) and which should be strong.  However, the refined max-min algorithm produces a presentation with more uniform image qualities.
+</P>
+
+<P ALIGN="CENTER">
+<IMG SRC="layers.gif" WIDTH=501 HEIGHT=372 ALT="[IMG]">
+<BR>
+<STRONG>Figure 2:</STRONG> Percentage of layers sent by criterion under the layer-oriented quality measure. 
+</P>
+
+<P>
+We can also see from Fig.&nbsp;2 that the worst case object quality is 50 percent for the refined max-min criterion.  The ordinary max-min criterion would have stopped at this point, generating a policy that transmits 50% of the layers for each object.  The refined max-min criterion enables the presentation to display more layers than an ordinary max-min criterion while still respecting the max-min philosophy.
+</P>
+
+<P>
+Fig.&nbsp;3 shows the percentage of bits sent for each object under using the bit-oriented quality measure. Here the two algorithms give strikingly different policies.  While the refined max-min algorithm continues to distribute relatively equal importance across all objects, the total quality algorithm selects a highly non-uniform distribution.  The worst case object quality for the refined max-min criterion is approximately 30 percent of the object's bits, while that of the total quality criterion is less than 10 percent.
+</P>
+
+<P ALIGN="CENTER">
+<IMG SRC="bits.gif" WIDTH=501 HEIGHT=372 ALT="[IMG]">
+<BR>
+<STRONG>Figure 3:</STRONG> Percentage of layers sent by criterion under the bit-oriented quality measure.
+</P>
+
+<P>
+In order to further examine the differences between the two criteria and the two quality measures, we computed the optimal policies for the sample  presentation while varying the level of bandwidth.  We plotted two different summary statistics: minimum percentage of layers rendered by bandwidth (Fig.&nbsp;4), and average percentage of layers rendered by bandwidth (Fig.&nbsp;5).
+</P>
+
+<P ALIGN="CENTER">
+<IMG SRC="bandwidth_minlayers.gif" WIDTH=501 HEIGHT=372 ALT="[IMG]">
+<BR>
+<STRONG>Figure 4:</STRONG> Minimum percentage of layers rendered by bandwidth.
+</P>
+
+<P ALIGN="CENTER">
+<IMG SRC="bandwidth_avglayers.gif" WIDTH=501 HEIGHT=372 ALT="[IMG]">
+<BR>
+<STRONG>Figure 5:</STRONG> Average percentage of layers rendered by bandwidth.
+</P>
+
+<P>
+Fig.&nbsp;4 demonstrates that the refined max-min criterion is superior to the total quality criterion with respect to minimizing the worst quality, which isn't surprising, because this objective is its primary motivation.  It should also be noted that the layer-oriented quality measure performs better than the bit-oriented quality measure.  There are a few points where the total quality criterion with the layer-oriented measure performs better than the refined max-min criterion with the bit-oriented measure, but in general the refined max-min criterion is better with both quality measures.
+</P>
+
+<P>
+Fig.&nbsp;5 shows the average percentage of layers rendered by bandwidth levels.  Here the total quality criterion based on the layer-oriented quality measure is superior to the other methods, especially for the lower and mid-range bandwidths. The total quality criterion with the bit-oriented quality measure also appears to do well in the lower bandwidths, but gives weaker results for higher levels of bandwidth.  At high levels of bandwidth, the various methods converge, but the refined max-min criterion based on the layer-oriented quality measure converges the most quickly. The refined max-min criterion with the bit-oriented quality measure is the clear loser in this comparison.
+</P>
+
+<P>
+In summary, the four objectives can produce rather different optimal policies.  We believe that the refined max-min criterion is superior to the total quality and max-min criteria.  Nevertheless, in order to make a more definite conclusion, subjective testing with human subjects is needed.  Also, it is desirable to experiment with other quality values that take into account the mean-squared error.
+</P>
+
+<H5><A HREF="#toc"><-- Back to Table of Contents></A></H5>
+
+<P><HR></P>
+
+<H2><A NAME="references">7. References</A></H2>
+
+<DL>
+<DT><A NAME="ref1">[1]</A></DT>
+<DD>D. Turner and K. Ross. 
+Adaptive Streaming of Layer-Encoded Multimedia Presentations.
+Submitted.
+</DD>
+
+<DT><A NAME="ref2">[2]</A></DT>
+<DD>E. Denardo.  <I>Dynamic Programming,</I> Prentice-Hall, Inc., Englewood Cliffs, NJ, 1982.
+</DD>
+
+<DT><A NAME="ref3">[3]</A></DT>
+<DD>W. Zhao, M. Willebeek-LeMair and P. Tiwari.
+Malleable Multimedia Presentations: 
+Adaptive Streaming Tradeoffs for Best-Quality Fast-Response Systems. 
+<I>Proceedings of the 10th Tyrrhenian International Workshop on Digital Communications</I>, September 1998.
+</DD>
+
+<DT><A NAME="ref4">[4]</A></DT>
+<DD>W. Zhao, M. Willebeek-LeMair and P. Tiwari.
+Efficient Adaptive Media Scaling and Streaming of Layered Multimedia in Heterogeneous Environments.
+<I>Proceedings of the IEEE International Conference on Multimedia Computing and Systems,</I> June 1999.
+</DD>
+
+<DT><A NAME="ref5">[5]</A></DT>
+<DD>K.S. Candan, B. Prabhakaran and V.S. Subrahmanian.
+Retrieval Schedules Based on Resource Availibility and Flexible Presentation Specifications. 
+<I>Multimedia Systems</I>, July, 1998.
+</DD>
+
+<DT><A NAME="ref6">[6]</A></DT>
+<DD>D. Saparilla and K. Ross.
+Optimal Streaming of Layered Video.
+<I>Proceedings of IEEE Infocom 2000</I>, March 2000, Tel Aviv, Israel.
+</DD>
+</DL>
+
+<H5><A HREF="#toc"><-- Back to Table of Contents></A></H5>
+
+<P><HR></P>
+
+</BODY>
+</HTML>
