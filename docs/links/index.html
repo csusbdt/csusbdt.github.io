@@ -20,13 +20,20 @@ a {
 <body>
 	<div id="title">A Sampling of Videos I Enjoyed</div>
 	<div style="margin-top: 1em"><a href="../">back</a></div>
-    <div id="content"></div>
+    <div id="content"><br>loading...</div>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script type="module">
+		const content = localStorage.getItem('csusbdt_videos');
+		if (content !== null) {
+			document.getElementById('content').innerHTML = marked.parse(content);
+		}
 		fetch("https://raw.githubusercontent.com/wiki/csusbdt/csusbdt.github.io/A-Sampling-of-Videos-I-Enjoyed.md", {cache: "no-store"})
 		.then(response => {
 			response.text().then(text => {
-				document.getElementById('content').innerHTML = marked.parse(text);
+				if (text !== content) {
+					document.getElementById('content').innerHTML = marked.parse(text);
+					localStorage.setItem('csusbdt_videos', text);
+				}
 			});
 		}); 
     </script>
