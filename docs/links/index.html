@@ -20,19 +20,19 @@ a {
 <body>
 	<div id="title">A Sampling of Videos I Enjoyed</div>
 	<div style="margin-top: 1em"><a href="../">back</a></div>
-    <div id="content"><br>loading...</div>
+    <div id="videos_wiki"><br>loading...</div>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script type="module">
-		const content = localStorage.getItem('csusbdt_videos');
-		if (content !== null) {
-			document.getElementById('content').innerHTML = marked.parse(content);
+		const videos_wiki = localStorage.getItem('videos_wiki');
+		if (videos_wiki !== null) {
+			document.getElementById('videos_wiki').innerHTML = marked.parse(videos_wiki);
 		}
 		fetch("https://raw.githubusercontent.com/wiki/csusbdt/csusbdt.github.io/A-Sampling-of-Videos-I-Enjoyed.md", {cache: "no-store"})
 		.then(response => {
 			response.text().then(text => {
-				if (text !== content) {
-					document.getElementById('content').innerHTML = marked.parse(text);
-					localStorage.setItem('csusbdt_videos', text);
+				if (text !== videos_wiki) {
+					document.getElementById('videos_wiki').innerHTML = marked.parse(text);
+					localStorage.setItem('videos_wiki', text);
 				}
 			});
 		}); 

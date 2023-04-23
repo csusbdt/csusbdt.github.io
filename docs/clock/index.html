@@ -62,7 +62,7 @@ canvas {
   </table>
   <div style="margin-top: 1em">Use negative values for western longitudes and southern latitudes.</div>
   <hr>
-  <div id="wiki"></div>
+  <div id="clock_wiki"></div>
   
   <hr><!-- --------------------------------------------------------------------- -->
 
@@ -70,15 +70,18 @@ canvas {
   <script src="./meuusjs.1.0.3.min.js"></script>
   <script src="./clock.js" type="module"></script>
   <script type="module">
-    console.log(window.location.href);
-    let s = window.location.href.lastIndexOf("/");
-    let e = window.location.href.lastIndexOf(".html");
-    let n = window.location.href.substr(s + 1, e - s - 1);
+    const clock_wiki = localStorage.getItem('clock_wiki');
+    if (clock_wiki !== null) {
+       document.getElementById('clock_wiki').innerHTML = marked.parse(clock_wiki);
+    }
     fetch("https://raw.githubusercontent.com/wiki/csusbdt/csusbdt.github.io/Clock.md", {cache: "no-store"})
     .then(response => {
-      response.text().then(text => {
-        document.getElementById('wiki').innerHTML = marked.parse(text);
-      });
+        response.text().then(text => {
+            if (text !== clock_wiki) {
+                document.getElementById('clock_wiki').innerHTML = marked.parse(text);
+                localStorage.setItem('clock_wiki', text);
+            }
+        });  
     }); 
   </script>
 
