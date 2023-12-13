@@ -62,7 +62,7 @@ back_touch.stops(back).starts(blop, back_closing);
 play_touch.stops(play).starts(blop, play_closing, say_it);
 back_closing.starts(delay(.5).starts(_ => { 
     setTimeout(init, 500);
-    window.location = '../'; 
+    window.location = '../puzzle/'; 
 }));
 play_closing.starts(pause_opening);
 pause_opening.starts(pause_view);
